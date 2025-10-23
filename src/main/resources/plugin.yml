@@ -1,0 +1,43 @@
+name: CandyRush
+version: '${version}'
+main: com.candyrush.CandyRushPlugin
+api-version: '1.21'
+description: Team-based point collection game
+author: CandyRush Team
+website: https://github.com/candyrush/candy-rush
+
+softdepend:
+  - MythicMobs
+
+commands:
+  stats:
+    description: Show game statistics and rankings
+    usage: /stats [top|teams|help]
+    permission: candyrush.stats
+  convert:
+    description: Convert all food in inventory to points
+    usage: /convert
+    permission: candyrush.convert
+  shop:
+    description: Open the item shop
+    usage: /shop
+    permission: candyrush.shop
+  candyrush:
+    description: Debug and admin commands
+    usage: /candyrush <status|start|stop|reset|setcenter|clearcenter>
+    permission: candyrush.admin
+    aliases: [cr]
+
+permissions:
+  candyrush.stats:
+    description: Allows use of /stats command
+    default: true
+  candyrush.convert:
+    description: Allows use of /convert command
+    default: true
+  candyrush.shop:
+    description: Allows use of /shop command
+    default: true
+  candyrush.admin:
+    description: Admin permissions
+    default: op

@@ -1,0 +1,15 @@
+# Event NPC - Spawns during game for raid events
+EventNPC:
+  Type: VILLAGER
+  Display: '&6&lイベントNPC'
+  Health: 100
+  Damage: 0
+  Options:
+    MovementSpeed: 0.0
+    Silent: true
+    Despawn: false
+    PreventOtherDrops: true
+    Invincible: true
+  AIGoalSelectors:
+    - clear
+  Skills: []

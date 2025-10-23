@@ -1,0 +1,233 @@
+# Candy Rush Shop Configuration
+# ショップで販売されるアイテムの設定
+# カテゴリ: 武器 / 防具 / 食料 / バフアイテム / 便利ツール
+
+items:
+  # ========== 武器 ==========
+  - id: wooden_sword
+    name: "§f[武器] §7木の剣"
+    material: WOODEN_SWORD
+    price: 10
+    category: weapon
+
+  - id: stone_sword
+    name: "§f[武器] §7石の剣"
+    material: STONE_SWORD
+    price: 25
+    category: weapon
+
+  - id: iron_sword
+    name: "§f[武器] §7鉄の剣"
+    material: IRON_SWORD
+    price: 50
+    category: weapon
+
+  - id: diamond_sword
+    name: "§f[武器] §bダイヤの剣"
+    material: DIAMOND_SWORD
+    price: 150
+    category: weapon
+
+  - id: bow
+    name: "§f[武器] §7弓"
+    material: BOW
+    price: 30
+    category: weapon
+
+  - id: crossbow
+    name: "§f[武器] §7クロスボウ"
+    material: CROSSBOW
+    price: 40
+    category: weapon
+
+  # ========== 防具 ==========
+  - id: leather_helmet
+    name: "§f[防具] §6革の帽子"
+    material: LEATHER_HELMET
+    price: 15
+    category: armor
+
+  - id: leather_chestplate
+    name: "§f[防具] §6革の上着"
+    material: LEATHER_CHESTPLATE
+    price: 20
+    category: armor
+
+  - id: leather_leggings
+    name: "§f[防具] §6革のズボン"
+    material: LEATHER_LEGGINGS
+    price: 15
+    category: armor
+
+  - id: leather_boots
+    name: "§f[防具] §6革のブーツ"
+    material: LEATHER_BOOTS
+    price: 10
+    category: armor
+
+  - id: iron_helmet
+    name: "§f[防具] §f鉄の帽子"
+    material: IRON_HELMET
+    price: 40
+    category: armor
+
+  - id: iron_chestplate
+    name: "§f[防具] §f鉄の上着"
+    material: IRON_CHESTPLATE
+    price: 50
+    category: armor
+
+  - id: iron_leggings
+    name: "§f[防具] §f鉄のズボン"
+    material: IRON_LEGGINGS
+    price: 45
+    category: armor
+
+  - id: iron_boots
+    name: "§f[防具] §f鉄のブーツ"
+    material: IRON_BOOTS
+    price: 35
+    category: armor
+
+  - id: shield
+    name: "§f[防具] §7盾"
+    material: SHIELD
+    price: 25
+    category: armor
+
+  # ========== 食料 ==========
+  - id: bread_8
+    name: "§f[食料] §eパン x8"
+    material: BREAD
+    amount: 8
+    price: 5
+    category: food
+
+  - id: cooked_beef_4
+    name: "§f[食料] §eステーキ x4"
+    material: COOKED_BEEF
+    amount: 4
+    price: 10
+    category: food
+
+  - id: golden_carrot_4
+    name: "§f[食料] §6金のニンジン x4"
+    material: GOLDEN_CARROT
+    amount: 4
+    price: 20
+    category: food
+
+  - id: golden_apple
+    name: "§f[食料] §6金のリンゴ"
+    material: GOLDEN_APPLE
+    price: 100
+    category: food
+
+  - id: enchanted_golden_apple
+    name: "§f[食料] §dエンチャント金のリンゴ"
+    material: ENCHANTED_GOLDEN_APPLE
+    price: 300
+    category: food
+
+  # ========== バフアイテム ==========
+  - id: healing_potion
+    name: "§f[バフ] §d治癒のポーション"
+    material: POTION
+    price: 20
+    potion-type: INSTANT_HEAL
+    category: buff
+
+  - id: healing_potion_2
+    name: "§f[バフ] §d治癒のポーションII"
+    material: POTION
+    price: 40
+    potion-type: STRONG_INSTANT_HEAL
+    category: buff
+
+  - id: speed_potion
+    name: "§f[バフ] §b俊敏のポーション"
+    material: POTION
+    price: 25
+    potion-type: SWIFTNESS
+    category: buff
+
+  - id: strength_potion
+    name: "§f[バフ] §c力のポーション"
+    material: POTION
+    price: 30
+    potion-type: STRENGTH
+    category: buff
+
+  - id: regeneration_potion
+    name: "§f[バフ] §d再生のポーション"
+    material: POTION
+    price: 35
+    potion-type: REGENERATION
+    category: buff
+
+  - id: fire_resistance_potion
+    name: "§f[バフ] §6火炎耐性のポーション"
+    material: POTION
+    price: 30
+    potion-type: FIRE_RESISTANCE
+    category: buff
+
+  # ========== 便利ツール ==========
+  - id: arrow_16
+    name: "§f[ツール] §f矢 x16"
+    material: ARROW
+    amount: 16
+    price: 10
+    category: tool
+
+  - id: arrow_64
+    name: "§f[ツール] §f矢 x64"
+    material: ARROW
+    amount: 64
+    price: 30
+    category: tool
+
+  - id: ender_pearl_2
+    name: "§f[ツール] §5エンダーパール x2"
+    material: ENDER_PEARL
+    amount: 2
+    price: 50
+    category: tool
+
+  - id: totem_of_undying
+    name: "§f[ツール] §6不死のトーテム"
+    material: TOTEM_OF_UNDYING
+    price: 500
+    category: tool
+
+  - id: cobblestone_64
+    name: "§f[ツール] §7丸石 x64"
+    material: COBBLESTONE
+    amount: 64
+    price: 5
+    category: tool
+
+  - id: torch_16
+    name: "§f[ツール] §e松明 x16"
+    material: TORCH
+    amount: 16
+    price: 5
+    category: tool
+
+  - id: water_bucket
+    name: "§f[ツール] §9水入りバケツ"
+    material: WATER_BUCKET
+    price: 15
+    category: tool
+
+  - id: lava_bucket
+    name: "§f[ツール] §6溶岩入りバケツ"
+    material: LAVA_BUCKET
+    price: 25
+    category: tool
+
+  - id: bed
+    name: "§f[ツール] §cベッド"
+    material: RED_BED
+    price: 20
+    category: tool

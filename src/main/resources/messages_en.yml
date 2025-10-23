@@ -1,0 +1,150 @@
+# CandyRush English Messages
+
+# General
+prefix: "&6[CandyRush] &r"
+no_permission: "&cYou don't have permission."
+player_only: "&cThis command can only be executed by players."
+
+# Game States
+game:
+  countdown_start: "&eGame starts in &6{seconds}&e seconds..."
+  game_start: "&a&lGame Start!"
+  game_end: "&c&lGame Over!"
+  team_join: "&aYou joined the {team} team!"
+  already_running: "&cGame is already running!"
+  not_running: "&cGame is not running."
+  insufficient_players: "&cNot enough players! Need at least {min} players."
+  first_place: "&e&lYour team is in 1st place!"
+
+# Teams
+team:
+  red: "&cRed"
+  blue: "&9Blue"
+  green: "&aGreen"
+  yellow: "&eYellow"
+
+# Stats Command
+stats:
+  title: "&6===== Game Statistics ====="
+  your_points: "&eYour Points: &6{points}"
+  your_rank: "&eYour Rank: &6#{rank}"
+  top_players: "&6===== Top 10 Players ====="
+  player_entry: "&e#{rank} &f{player} &7- &6{points}pt"
+  team_rankings: "&6===== Team Rankings ====="
+  team_entry: "&e#{rank} {team} &7- &6{points}pt"
+  help: "&6===== Stats Command Help ====="
+  help_usage: "&e/stats &7- Show your stats"
+  help_top: "&e/stats top &7- Show top 10 players"
+  help_teams: "&e/stats teams &7- Show team rankings"
+
+# Convert Command
+convert:
+  success: "&a&l✓ Conversion Complete!"
+  converted: "&eConverted &6{items} items &eto &6{points}pt!"
+  total_points: "&eTotal Points: &6{points}pt"
+  nothing_to_convert: "&cNo food items to convert in your inventory!"
+
+# Shop Command
+shop:
+  opened: "&aShop opened!"
+  title: "&6Item Shop"
+  insufficient_points: "&cNot enough points! Need &6{required}pt &c(You have: &6{current}pt&c)"
+  purchase_success: "&a&l✓ Purchase Complete!"
+  purchased: "&ePurchased &6{item} &efor &6{points}pt"
+  remaining_points: "&eRemaining Points: &6{points}pt"
+
+# Boss Events
+boss:
+  spawn_title: "&6&l★ &d&lBoss Appeared! &6&l★"
+  spawn_subtitle: "&eDefeat to earn points"
+  spawn_announcement: "&6&l★★★ Candy Lord Appeared! ★★★"
+  player_achievement: "&e{player} &acompleted defense event {count} times!"
+  boss_name: "&d&lCandy Lord Sugar Lord"
+  defeated_title: "&6&l★ &a&lBoss Defeated! &6&l★"
+  defeated_subtitle: "&e+{points}pt earned"
+  defeated_announcement: "&6&l★★★ Boss Defeated! ★★★"
+  defeated_by: "&e{player} &adefeated the boss!"
+  reward: "&6&l+{points}pt &7earned"
+
+# Defense Event
+defense:
+  start_title: "&e&l⚠ Defense Event Started! ⚠"
+  start_message: "&aDefeat all monster waves to protect the NPC!"
+  already_in_event: "&cYou're already in a defense event!"
+  npc_help_message: "&e&l[NPC] &cHelp! I'm being attacked by monsters!"
+  wave_start: "&c&l⚠ Wave {wave} monsters appeared!"
+  final_wave: "&4&l⚠ Final Wave! Elite monsters appeared! ⚠"
+  success_title: "&a&l✓ Defense Success!"
+  success_npc: "&e&l[NPC] &aThank you! Please take this!"
+  success_reward: "&6&l+{points}pt &7reward earned!"
+  success_count: "&7Defense Events Cleared: &e{count}&7 times"
+  fail_title: "&c&l✗ Defense Failed..."
+  fail_message: "&7The NPC was defeated by monsters..."
+  abandon_title: "&c&lYou went too far from the defense area!"
+  abandon_message: "&7Event was cancelled..."
+  status_bar: "&e&lDefending! &7Wave: &a{wave}&7/&a{total} &7| Remaining: &c{time}s &7| Monsters: &c{count}"
+
+# Treasure Chests
+treasure:
+  found: "&a&l✓ Treasure Discovered!"
+  reward: "&6&l+{points}pt &7and items obtained!"
+  trapped: "&c&l✗ It was a trap!"
+  trapped_damage: "&7Took damage and equipment damaged!"
+
+# Murderer System
+murderer:
+  become_title: "&c&l⚠ You became a Murderer! ⚠"
+  become_message: "&cKill other players to steal their points!"
+  announcement: "&c{player} became a Murderer!"
+  killed_by: "&cYou were killed by Murderer {player}!"
+  points_stolen: "&c-{points}pt stolen"
+  kill_success: "&a&l✓ Kill Success!"
+  kill_reward: "&6&l+{points}pt &7stolen from {victim}"
+  expired: "&7Murderer status expired."
+
+# Admin Commands
+admin:
+  debug_help_title: "&6===== CandyRush Debug Commands ====="
+  debug_status: "&e/candyrush status &7- Show current game state"
+  debug_start: "&e/candyrush start &7- Force start game"
+  debug_stop: "&e/candyrush stop &7- Force stop game"
+  debug_reset: "&e/candyrush reset &7- Reset game"
+  debug_setcenter: "&e/candyrush setcenter &7- Set current position as map center"
+  debug_clearcenter: "&e/candyrush clearcenter &7- Clear map center (random selection)"
+
+  status_title: "&6===== Game Status ====="
+  status_state: "&eState: &f{state}"
+  status_online: "&eOnline Players: &f{online}"
+  status_min: "&eMin Players: &f{min}"
+  status_can_start: "&eCan Start: &f{canStart}"
+  status_can_join: "&eCan Join: &f{canJoin}"
+  status_running: "&eIs Running: &f{running}"
+  status_round: "&eRound ID: &f{round}"
+  status_teams_title: "&6===== Teams ====="
+  status_team_player: "&e{player}: &f{team}"
+
+  start_already_started: "&cGame is already started or starting. Current: {state}"
+  start_no_players: "&cNo players online!"
+  start_success: "&aForcing game start..."
+  start_failed: "&cCountdown failed to start."
+  start_check_status: "&cCheck reason: /candyrush status"
+
+  stop_not_running: "&cGame is not running."
+  stop_success: "&aForcing game stop..."
+  stop_not_implemented: "&eFeature not implemented yet."
+
+  reset_success: "&aResetting game..."
+  reset_complete: "&aGame reset to WAITING state."
+
+  setcenter_border: "&a━━━━━━━━━━━━━━━━━━━━━━"
+  setcenter_title: "&e&lMap Center Coordinates Set!"
+  setcenter_x: "&aX: &f{x}"
+  setcenter_z: "&aZ: &f{z}"
+  setcenter_note: "&7These coordinates will be used from next game."
+
+  clearcenter_already_cleared: "&eCenter coordinates are already cleared."
+  clearcenter_using_spawn: "&7World spawn will be used for next game."
+  clearcenter_border: "&a━━━━━━━━━━━━━━━━━━━━━━"
+  clearcenter_title: "&e&lMap Center Coordinates Cleared!"
+  clearcenter_previous: "&7Previous setting: X={x}, Z={z}"
+  clearcenter_note: "&7World spawn will be used as center for next game."

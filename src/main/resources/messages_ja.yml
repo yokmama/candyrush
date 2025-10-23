@@ -1,0 +1,150 @@
+# CandyRush 日本語メッセージ
+
+# 一般
+prefix: "&6[CandyRush] &r"
+no_permission: "&c権限がありません。"
+player_only: "&cこのコマンドはプレイヤーのみ実行できます。"
+
+# ゲーム状態
+game:
+  countdown_start: "&eゲーム開始まで&6{seconds}&e秒..."
+  game_start: "&a&lゲーム開始！"
+  game_end: "&c&lゲーム終了！"
+  team_join: "&aあなたは{team}チームに参加しました！"
+  already_running: "&cゲームは既に実行中です！"
+  not_running: "&cゲームは実行されていません。"
+  insufficient_players: "&cプレイヤーが足りません！最低{min}人必要です。"
+  first_place: "&e&lあなたのチームが1位になった！"
+
+# チーム
+team:
+  red: "&c赤"
+  blue: "&9青"
+  green: "&a緑"
+  yellow: "&e黄"
+
+# 統計コマンド
+stats:
+  title: "&6===== ゲーム統計 ====="
+  your_points: "&eあなたのポイント: &6{points}"
+  your_rank: "&eあなたの順位: &6#{rank}"
+  top_players: "&6===== トップ10プレイヤー ====="
+  player_entry: "&e#{rank} &f{player} &7- &6{points}pt"
+  team_rankings: "&6===== チームランキング ====="
+  team_entry: "&e#{rank} {team} &7- &6{points}pt"
+  help: "&6===== 統計コマンドヘルプ ====="
+  help_usage: "&e/stats &7- 自分の統計を表示"
+  help_top: "&e/stats top &7- トップ10プレイヤーを表示"
+  help_teams: "&e/stats teams &7- チームランキングを表示"
+
+# 変換コマンド
+convert:
+  success: "&a&l✓ 変換完了！"
+  converted: "&e&6{items}個 &eのアイテムを &6{points}pt &eに変換しました！"
+  total_points: "&e合計ポイント: &6{points}pt"
+  nothing_to_convert: "&cインベントリに変換できる食べ物がありません！"
+
+# ショップコマンド
+shop:
+  opened: "&aショップを開きました！"
+  title: "&6アイテムショップ"
+  insufficient_points: "&cポイントが足りません！必要: &6{required}pt &c(現在: &6{current}pt&c)"
+  purchase_success: "&a&l✓ 購入完了！"
+  purchased: "&e&6{item} &eを &6{points}pt &eで購入しました"
+  remaining_points: "&e残りポイント: &6{points}pt"
+
+# ボスイベント
+boss:
+  spawn_title: "&6&l★ &d&lボス出現！ &6&l★"
+  spawn_subtitle: "&e討伐するとポイント獲得"
+  spawn_announcement: "&6&l★★★ お菓子の王出現！ ★★★"
+  player_achievement: "&e{player} &aが防衛イベントを{count}回クリアしました！"
+  boss_name: "&d&lお菓子の王 シュガーロード"
+  defeated_title: "&6&l★ &a&lボス討伐成功！ &6&l★"
+  defeated_subtitle: "&e+{points}pt 獲得"
+  defeated_announcement: "&6&l★★★ ボス討伐成功！ ★★★"
+  defeated_by: "&e{player} &aがボスを討伐しました！"
+  reward: "&6&l+{points}pt &7獲得"
+
+# 防衛イベント
+defense:
+  start_title: "&e&l⚠ 防衛イベント開始！ ⚠"
+  start_message: "&aモンスターの波を全て倒してNPCを守りきれ！"
+  already_in_event: "&c既に防衛イベント中です！"
+  npc_help_message: "&e&l[NPC] &c助けてください！モンスターに襲われています！"
+  wave_start: "&c&l⚠ 第{wave}波のモンスターが出現！"
+  final_wave: "&4&l⚠ 最終波！エリートモンスターが出現！ ⚠"
+  success_title: "&a&l✓ 防衛成功！"
+  success_npc: "&e&l[NPC] &aありがとうございます！これを受け取ってください！"
+  success_reward: "&6&l+{points}pt &7報酬を獲得しました！"
+  success_count: "&7防衛イベントクリア: &e{count}&7回"
+  fail_title: "&c&l✗ 防衛失敗..."
+  fail_message: "&7NPCがモンスターにやられてしまった..."
+  abandon_title: "&c&l防衛エリアから離れすぎました！"
+  abandon_message: "&7イベントが中止されました..."
+  status_bar: "&e&l防衛中！ &7波: &a{wave}&7/&a{total} &7| 残り: &c{time}秒 &7| モンスター: &c{count}"
+
+# 宝箱
+treasure:
+  found: "&a&l✓ 宝物を発見！"
+  reward: "&6&l+{points}pt &7とアイテムを入手！"
+  trapped: "&c&l✗ 罠だった！"
+  trapped_damage: "&7ダメージを受け、装備が傷つきました！"
+
+# Murdererシステム
+murderer:
+  become_title: "&c&l⚠ あなたはMurdererになった！ ⚠"
+  become_message: "&c他のプレイヤーを倒してポイントを奪え！"
+  announcement: "&c{player}がMurdererになった！"
+  killed_by: "&cあなたはMurderer {player}に倒されました！"
+  points_stolen: "&c-{points}pt 奪われた"
+  kill_success: "&a&l✓ キル成功！"
+  kill_reward: "&6&l+{points}pt &7を{victim}から奪取"
+  expired: "&7Murderer状態が解除されました。"
+
+# 管理コマンド
+admin:
+  debug_help_title: "&6===== CandyRush デバッグコマンド ====="
+  debug_status: "&e/candyrush status &7- ゲームの現在状態を表示"
+  debug_start: "&e/candyrush start &7- ゲームを強制開始"
+  debug_stop: "&e/candyrush stop &7- ゲームを強制停止"
+  debug_reset: "&e/candyrush reset &7- ゲームをリセット"
+  debug_setcenter: "&e/candyrush setcenter &7- 現在位置をマップ中心座標に設定"
+  debug_clearcenter: "&e/candyrush clearcenter &7- マップ中心座標をクリア（ランダム選択）"
+
+  status_title: "&6===== Game Status ====="
+  status_state: "&e状態: &f{state}"
+  status_online: "&eオンラインプレイヤー: &f{online}"
+  status_min: "&e最低人数: &f{min}"
+  status_can_start: "&e開始可能: &f{canStart}"
+  status_can_join: "&e参加可能: &f{canJoin}"
+  status_running: "&e実行中: &f{running}"
+  status_round: "&eラウンドID: &f{round}"
+  status_teams_title: "&6===== チーム ====="
+  status_team_player: "&e{player}: &f{team}"
+
+  start_already_started: "&cゲームは既に開始されているか、開始待機中です。現在: {state}"
+  start_no_players: "&cプレイヤーが1人もいません！"
+  start_success: "&aゲームを強制開始します..."
+  start_failed: "&cカウントダウンが開始されませんでした。"
+  start_check_status: "&c理由を確認してください: /candyrush status"
+
+  stop_not_running: "&cゲームは実行されていません。"
+  stop_success: "&aゲームを強制停止します..."
+  stop_not_implemented: "&e機能は未実装です。"
+
+  reset_success: "&aゲームをリセットします..."
+  reset_complete: "&aゲームがWAITING状態にリセットされました。"
+
+  setcenter_border: "&a━━━━━━━━━━━━━━━━━━━━━━"
+  setcenter_title: "&e&lマップ中心座標を設定しました！"
+  setcenter_x: "&aX: &f{x}"
+  setcenter_z: "&aZ: &f{z}"
+  setcenter_note: "&7次回のゲームからこの座標が中心になります。"
+
+  clearcenter_already_cleared: "&e中心座標は既にクリアされています。"
+  clearcenter_using_spawn: "&7次回のゲームではワールドスポーンが使用されます。"
+  clearcenter_border: "&a━━━━━━━━━━━━━━━━━━━━━━"
+  clearcenter_title: "&e&lマップ中心座標をクリアしました！"
+  clearcenter_previous: "&7以前の設定: X={x}, Z={z}"
+  clearcenter_note: "&7次回のゲームではワールドスポーンが中心になります。"

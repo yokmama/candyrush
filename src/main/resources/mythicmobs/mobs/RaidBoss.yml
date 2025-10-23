@@ -1,0 +1,21 @@
+# Raid Boss - Spawned during raid events
+RaidBoss:
+  Type: ZOMBIE
+  Display: '&c&l襲撃ボス'
+  Health: 200
+  Damage: 10
+  Armor: 10
+  Options:
+    MovementSpeed: 0.25
+    Silent: false
+    Despawn: false
+    PreventOtherDrops: true
+  Equipment:
+    - IRON_SWORD:0 HAND
+    - IRON_HELMET:0 HEAD
+    - IRON_CHESTPLATE:0 CHEST
+    - IRON_LEGGINGS:0 LEGS
+    - IRON_BOOTS:0 FEET
+  Drops:
+    - exp 50-100 1.0
+  Skills: []

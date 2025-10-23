@@ -1,0 +1,88 @@
+# CandyRush Boss - Powerful boss mob with custom abilities
+# Boss Type 1: Sugar Lord - Melee fighter with fire abilities
+SugarLord:
+  Type: WITHER_SKELETON
+  Display: '&6&l★ &d&lお菓子の王 シュガーロード &6&l★'
+  Health: 500
+  Damage: 15
+  Armor: 20
+  Options:
+    MovementSpeed: 0.3
+    FollowRange: 50
+    KnockbackResistance: 0.8
+    AlwaysShowName: true
+    Silent: false
+    Despawn: false
+    PreventOtherDrops: true
+    PreventItemPickup: true
+    PreventSunburn: true
+  Equipment:
+    - NETHERITE_SWORD HAND
+    - NETHERITE_HELMET HEAD
+    - NETHERITE_CHESTPLATE CHEST
+    - NETHERITE_LEGGINGS LEGS
+    - NETHERITE_BOOTS FEET
+  Drops:
+    - CandyRushBossDrops
+  Skills:
+    - potion{type=STRENGTH;duration=100;level=1} @self ~onTimer:100
+    - leap{velocity=1.5} @target ~onTimer:60
+    - heal{amount=50} @self ~onDamaged >0.5
+
+# Boss Type 2: Chocolate King - Tank boss with high defense
+ChocolateKing:
+  Type: ZOMBIE
+  Display: '&6&l★ &c&lチョコレート王 カカオマスター &6&l★'
+  Health: 700
+  Damage: 12
+  Armor: 30
+  Options:
+    MovementSpeed: 0.25
+    FollowRange: 50
+    KnockbackResistance: 0.9
+    AlwaysShowName: true
+    Silent: false
+    Despawn: false
+    PreventOtherDrops: true
+    PreventItemPickup: true
+    PreventSunburn: true
+  Equipment:
+    - NETHERITE_AXE HAND
+    - NETHERITE_HELMET HEAD
+    - NETHERITE_CHESTPLATE CHEST
+    - NETHERITE_LEGGINGS LEGS
+    - NETHERITE_BOOTS FEET
+  Drops:
+    - CandyRushBossDrops
+  Skills:
+    - potion{type=STRENGTH;duration=120;level=2} @self ~onTimer:120
+    - heal{amount=100} @self ~onDamaged >0.3
+
+# Boss Type 3: Candy Queen - Fast ranged attacker
+CandyQueen:
+  Type: SKELETON
+  Display: '&6&l★ &b&lキャンディ女王 グミエンプレス &6&l★'
+  Health: 400
+  Damage: 10
+  Armor: 15
+  Options:
+    MovementSpeed: 0.35
+    FollowRange: 60
+    KnockbackResistance: 0.6
+    AlwaysShowName: true
+    Silent: false
+    Despawn: false
+    PreventOtherDrops: true
+    PreventItemPickup: true
+    PreventSunburn: true
+  Equipment:
+    - BOW HAND
+    - DIAMOND_HELMET HEAD
+    - DIAMOND_CHESTPLATE CHEST
+    - DIAMOND_LEGGINGS LEGS
+    - DIAMOND_BOOTS FEET
+  Drops:
+    - CandyRushBossDrops
+  Skills:
+    - leap{velocity=1.2} @target ~onTimer:80
+    - shoot{type=ARROW;velocity=3;amount=5;spread=10} @target ~onTimer:60

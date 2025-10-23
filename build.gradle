@@ -1,0 +1,185 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'de.undercouch:gradle-download-task:5.4.0'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'io.github.goooler.shadow' version '8.1.8'
+    id 'de.undercouch.download' version '5.4.0'
+}
+
+group = 'com.candyrush'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'papermc'
+        url = 'https://repo.papermc.io/repository/maven-public/'
+    }
+    maven {
+        name = 'mythiccraft'
+        url = 'https://mvn.lumine.io/repository/maven-public/'
+    }
+}
+
+dependencies {
+    // Paper API
+    compileOnly 'io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT'
+
+    // MythicMobs
+    compileOnly 'io.lumine:Mythic-Dist:5.3.5'
+
+    // Database
+    implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
+    implementation 'com.zaxxer:HikariCP:5.0.1'
+    implementation 'org.slf4j:slf4j-api:2.0.7'
+    implementation 'org.slf4j:slf4j-simple:2.0.7'
+
+    // Testing
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
+    testImplementation 'org.mockito:mockito-core:5.3.1'
+    testImplementation 'com.github.seeseemelk:MockBukkit-v1.19:3.9.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+processResources {
+    filteringCharset = 'UTF-8'
+
+    filesMatching(['plugin.yml', 'paper-plugin.yml']) {
+        expand(
+            'version': project.version
+        )
+    }
+}
+
+shadowJar {
+    archiveClassifier.set('')
+
+    // HikariCPのみ再配置（SQLiteはネイティブライブラリを使うため再配置しない）
+    relocate 'com.zaxxer.hikari', 'com.candyrush.libs.hikari'
+    relocate 'org.slf4j', 'com.candyrush.libs.slf4j'
+
+    // SQLiteとHikariCPの依存関係を含める
+    dependencies {
+        include(dependency('org.xerial:sqlite-jdbc:.*'))
+        include(dependency('com.zaxxer:HikariCP:.*'))
+        include(dependency('org.slf4j:slf4j-api:.*'))
+        include(dependency('org.slf4j:slf4j-simple:.*'))
+    }
+}
+
+tasks.build.dependsOn shadowJar
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+// テストサーバー自動起動タスク
+task downloadPaper(type: Download) {
+    src "https://api.papermc.io/v2/projects/paper/versions/1.21.5/builds/16/downloads/paper-1.21.5-16.jar"
+    dest file("run/paper.jar")
+    overwrite false
+    onlyIfModified true
+}
+
+task setupServer(dependsOn: downloadPaper) {
+    doLast {
+        def serverDir = file('run')
+        serverDir.mkdirs()
+
+        // eula.txt作成
+        def eulaFile = file('run/eula.txt')
+        eulaFile.text = 'eula=true'
+
+        // server.properties作成
+        def serverProps = file('run/server.properties')
+        if (!serverProps.exists()) {
+            serverProps.text = '''
+server-port=25565
+gamemode=survival
+difficulty=normal
+max-players=20
+view-distance=10
+online-mode=false
+enable-command-block=true
+spawn-protection=0
+motd=CandyRush Development Server
+'''.stripIndent()
+        }
+
+        // pluginsディレクトリ作成
+        file('run/plugins').mkdirs()
+
+        println "Server setup complete!"
+    }
+}
+
+task downloadMythicMobs {
+    doLast {
+        def mythicMobsFile = file("run/plugins/MythicMobs-5.3.5.jar")
+
+        if (!mythicMobsFile.exists()) {
+            println "========================================"
+            println "MythicMobs is required but cannot be automatically downloaded."
+            println ""
+            println "Please manually download MythicMobs from:"
+            println "https://www.spigotmc.org/resources/mythicmobs.5702/"
+            println ""
+            println "And place it in: run/plugins/MythicMobs-5.3.5.jar"
+            println ""
+            println "Continuing without MythicMobs - some features will not work."
+            println "========================================"
+        } else {
+            println "MythicMobs found at: ${mythicMobsFile.absolutePath}"
+        }
+    }
+}
+
+task copyPlugin(type: Copy, dependsOn: shadowJar) {
+    from shadowJar.archiveFile
+    into 'run/plugins'
+    rename { 'CandyRush.jar' }
+}
+
+task runServer(dependsOn: [setupServer, downloadMythicMobs, copyPlugin]) {
+    doLast {
+        println "Starting Paper server..."
+        println "Type 'stop' to shutdown the server"
+        println "Plugin will be loaded from run/plugins/CandyRush.jar"
+        println ""
+
+        def serverJar = file('run/paper.jar')
+        if (!serverJar.exists()) {
+            throw new GradleException("Server JAR not found. Run 'setupServer' first.")
+        }
+
+        // Java 21のパスを明示的に指定
+        def javaExecutable = '/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home/bin/java'
+
+        exec {
+            workingDir 'run'
+            commandLine javaExecutable, '-Xmx2G', '-Xms1G', '-jar', 'paper.jar', 'nogui'
+            standardInput = System.in
+            standardOutput = System.out
+            errorOutput = System.err
+        }
+    }
+}
+
+// Download task class
+import de.undercouch.gradle.tasks.download.Download

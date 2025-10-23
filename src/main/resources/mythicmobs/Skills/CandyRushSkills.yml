@@ -1,0 +1,40 @@
+# Boss Skills
+BossRage:
+  Skills:
+    - effect:particles{p=FLAME;a=30;hs=0.5;vs=1;s=0.1;y=1} @self
+    - effect:sound{s=entity.blaze.ambient;v=1;p=0.5} @self
+    - potion{type=STRENGTH;duration=100;level=1} @self
+
+BossLeap:
+  Conditions:
+    - distance{d=5to15} true
+  Skills:
+    - leap{velocity=1.2;height=0.8} @target
+    - effect:particles{p=EXPLOSION;a=10} @self
+    - damage{amount=10;ignoreArmor=true} @PlayersInRadius{r=5}
+    - effect:sound{s=entity.generic.explode;v=1;p=0.8} @self
+
+BossHeal:
+  Cooldown: 20
+  Skills:
+    - heal{amount=50} @self
+    - effect:particles{p=HEART;a=20;hs=1;vs=1;s=0.2;y=1} @self
+    - effect:sound{s=entity.player.levelup;v=1;p=1.5} @self
+
+# Defense Mob Skills
+ZombieRage:
+  Cooldown: 10
+  Skills:
+    - potion{type=STRENGTH;duration=60;level=0} @self
+    - effect:particles{p=ANGRY_VILLAGER;a=10;hs=0.5;vs=1;s=0.1;y=1} @self
+    - effect:sound{s=entity.zombie.ambient;v=1;p=0.8} @self
+
+SkeletonVolley:
+  Cooldown: 15
+  Skills:
+    - projectile{onTick=VolleyArrow;interval=2;repeat=3} @target
+    - effect:sound{s=entity.skeleton.shoot;v=1;p=1.2} @self
+
+VolleyArrow:
+  Skills:
+    - effect:particles{p=CRIT;a=3} @self

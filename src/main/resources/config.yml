@@ -1,0 +1,104 @@
+# Candy Rush Configuration File
+
+# 言語設定 (Language Settings)
+# Available: ja (Japanese), en (English)
+language: ja
+
+# ゲーム設定
+game:
+  min-players: 2                    # 最低開始人数
+  countdown-seconds: 10             # カウントダウン時間（秒）
+  cooldown-minutes: 5               # クールダウン時間（分）
+  duration-minutes: 20              # ゲーム制限時間（分）
+  map-radius: 250                   # マップ半径（ブロック）
+  # マップ中心座標（固定する場合は設定、nullの場合は地上の構造物をランダム選択）
+  center-x: null                    # X座標（null = ワールドスポーン）
+  center-z: null                    # Z座標（null = ワールドスポーン）
+
+# チーム設定
+teams:
+  colors:
+    - RED
+    - BLUE
+    - GREEN
+    - YELLOW
+
+# 宝箱設定
+treasure:
+  per-chunk: 1                      # 1チャンクあたりの宝箱数
+  trapped-chest-damage: 4.0         # トラップチェストのダメージ（ハート2個）
+  trapped-chest-equipment-chance: 0.7  # 装備出現確率
+  respawn-delay-seconds: 60         # 再出現までの時間（秒）
+
+# イベント設定
+event:
+  npc-per-chunks: 3                 # NPCの配置間隔（チャンク）
+  proximity-range: 10               # NPCが助けを求める範囲（ブロック）
+  help-message-cooldown: 5          # 助けメッセージのクールダウン（秒）
+  defense-duration-seconds: 120     # 防衛イベント継続時間（秒、2分）
+  monster-waves: 3                  # モンスターの波の回数
+  monsters-per-wave: 5              # 1波あたりのモンスター数
+  wave-interval-seconds: 30         # 波の間隔（秒）
+  reward-points-min: 50             # 報酬ポイント最小
+  reward-points-max: 100            # 報酬ポイント最大
+  boss-spawn-threshold: 3           # ボス出現に必要な防衛イベントクリア回数
+
+# Murderer設定
+murderer:
+  duration-seconds: 600             # Murdererフラグ持続時間（秒、10分）
+
+# 天候・時間設定
+world:
+  weather: CLEAR                    # 天候固定（CLEAR, RAIN, THUNDER）
+  auto-morning: true                # 夜になったら朝にリセット
+
+# MythicMobs設定
+mythicmobs:
+  event-npc-type: "EventNPC"        # イベントNPCのMythicMobs ID
+  boss-types:                       # ボスの種類（ランダムに1体選ばれる）
+    - "SugarLord"                   # シュガーロード（近接・火）
+    - "ChocolateKing"               # チョコレート王（タンク）
+    - "CandyQueen"                  # キャンディ女王（遠距離）
+  defense-mobs:                     # 防衛イベントのモンスター種類（ランダムに選ばれる）
+    - "CandyZombie"
+    - "CandySkeleton"
+    - "CandySpider"
+    - "CandyCreeper"
+    - "GummyBear"
+    - "ChocolateSoldier"
+    - "LollipopArcher"
+    - "MintRunner"
+  defense-elite-mobs:               # 防衛イベントの強敵（最終波用、ランダムに選ばれる）
+    - "EliteCandyZombie"
+    - "EliteCandySkeleton"
+    - "EliteGummyTitan"
+    - "EliteChocolateKnight"
+
+# データベース設定
+database:
+  type: sqlite                      # sqlite or mysql
+  sqlite:
+    file: "data.db"
+  # MySQL設定（将来拡張用）
+  # mysql:
+  #   host: "localhost"
+  #   port: 3306
+  #   database: "candyrush"
+  #   username: "root"
+  #   password: "password"
+
+# デバッグ設定
+debug:
+  enabled: false
+  verbose-logging: false
+
+# メッセージ設定
+messages:
+  prefix: "&6[CandyRush] &r"
+  team-join: "{prefix}&aあなたは{team}チームに参加しました！"
+  countdown-start: "{prefix}&eゲーム開始まで&6{seconds}&e秒..."
+  game-start: "{prefix}&a&lゲーム開始！"
+  game-end: "{prefix}&c&lゲーム終了！"
+  boss-spawn: "{prefix}&4&lボス出現！"
+  murderer-announcement: "{prefix}&c{player}がMurdererになった！"
+  first-place: "{prefix}&e&lあなたのチームが1位になった！"

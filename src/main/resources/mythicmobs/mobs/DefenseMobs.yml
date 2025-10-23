@@ -1,0 +1,216 @@
+# Defense Event Custom Mobs
+# These mobs spawn during NPC defense events
+
+# ========== Basic Tier Mobs (Wave 1-2) ==========
+
+# Candy Zombie - Basic melee attacker
+CandyZombie:
+  Type: ZOMBIE
+  Display: '&2キャンディゾンビ'
+  Health: 30
+  Damage: 4
+  Armor: 2
+  Options:
+    MovementSpeed: 0.25
+    AlwaysShowName: false
+    PreventOtherDrops: true
+    PreventSunburn: true
+  Equipment:
+    - WOODEN_SWORD:0 HAND
+  Drops:
+    - DefenseZombieDrops
+
+# Candy Skeleton - Ranged attacker
+CandySkeleton:
+  Type: SKELETON
+  Display: '&fキャンディスケルトン'
+  Health: 25
+  Damage: 3
+  Armor: 2
+  Options:
+    MovementSpeed: 0.25
+    AlwaysShowName: false
+    PreventOtherDrops: true
+    PreventSunburn: true
+  Equipment:
+    - BOW:0 HAND
+    - LEATHER_HELMET:0 HEAD
+  Drops:
+    - DefenseSkeletonDrops
+
+# Candy Spider - Fast attacker
+CandySpider:
+  Type: SPIDER
+  Display: '&4キャンディスパイダー'
+  Health: 20
+  Damage: 3
+  Options:
+    MovementSpeed: 0.35
+    AlwaysShowName: false
+    PreventOtherDrops: true
+  Drops:
+    - DefenseSpiderDrops
+
+# Candy Creeper - Explosive threat
+CandyCreeper:
+  Type: CREEPER
+  Display: '&aキャンディクリーパー'
+  Health: 15
+  Damage: 5
+  Options:
+    MovementSpeed: 0.25
+    AlwaysShowName: false
+    PreventOtherDrops: true
+    ExplosionYield: 2.0
+  Drops:
+    - DefenseCreeperDrops
+
+# Gummy Bear - Tanky but slow
+GummyBear:
+  Type: ZOMBIE
+  Display: '&5グミベア'
+  Health: 40
+  Damage: 3
+  Armor: 4
+  Options:
+    MovementSpeed: 0.2
+    AlwaysShowName: false
+    PreventOtherDrops: true
+    PreventSunburn: true
+  Equipment:
+    - STONE_SWORD:0 HAND
+    - LEATHER_HELMET:0 HEAD
+  Drops:
+    - DefenseZombieDrops
+
+# Chocolate Soldier - Balanced attacker
+ChocolateSoldier:
+  Type: HUSK
+  Display: '&6チョコソルジャー'
+  Health: 35
+  Damage: 4
+  Armor: 3
+  Options:
+    MovementSpeed: 0.25
+    AlwaysShowName: false
+    PreventOtherDrops: true
+    PreventSunburn: true
+  Equipment:
+    - WOODEN_AXE:0 HAND
+  Drops:
+    - DefenseZombieDrops
+
+# Lollipop Archer - Basic ranged
+LollipopArcher:
+  Type: SKELETON
+  Display: '&eロリポップアーチャー'
+  Health: 22
+  Damage: 3
+  Armor: 2
+  Options:
+    MovementSpeed: 0.25
+    AlwaysShowName: false
+    PreventOtherDrops: true
+    PreventSunburn: true
+  Equipment:
+    - BOW:0 HAND
+  Drops:
+    - DefenseSkeletonDrops
+
+# Mint Runner - Fast melee
+MintRunner:
+  Type: SPIDER
+  Display: '&bミントランナー'
+  Health: 18
+  Damage: 3
+  Options:
+    MovementSpeed: 0.4
+    AlwaysShowName: false
+    PreventOtherDrops: true
+  Drops:
+    - DefenseSpiderDrops
+
+# ========== Elite Tier Mobs (Wave 3+) ==========
+
+# Elite variants for later waves
+EliteCandyZombie:
+  Type: ZOMBIE
+  Display: '&6&lエリート キャンディゾンビ'
+  Health: 50
+  Damage: 6
+  Armor: 5
+  Options:
+    MovementSpeed: 0.3
+    AlwaysShowName: true
+    PreventOtherDrops: true
+    PreventSunburn: true
+  Equipment:
+    - IRON_SWORD HAND
+    - IRON_HELMET HEAD
+    - CHAINMAIL_CHESTPLATE CHEST
+  Drops:
+    - DefenseEliteDrops
+  Skills:
+    - potion{type=STRENGTH;duration=60;level=1} @self ~onDamaged >0.3
+
+EliteCandySkeleton:
+  Type: SKELETON
+  Display: '&6&lエリート キャンディスケルトン'
+  Health: 40
+  Damage: 5
+  Armor: 5
+  Options:
+    MovementSpeed: 0.3
+    AlwaysShowName: true
+    PreventOtherDrops: true
+    PreventSunburn: true
+  Equipment:
+    - BOW HAND
+    - IRON_HELMET HEAD
+    - CHAINMAIL_CHESTPLATE CHEST
+  Drops:
+    - DefenseEliteDrops
+  Skills:
+    - shoot{type=ARROW;velocity=2.5;amount=3;spread=5} @target ~onTimer:100
+
+# Elite Gummy Titan - Super tank
+EliteGummyTitan:
+  Type: ZOMBIE
+  Display: '&5&lエリート グミタイタン'
+  Health: 80
+  Damage: 5
+  Armor: 8
+  Options:
+    MovementSpeed: 0.25
+    AlwaysShowName: true
+    PreventOtherDrops: true
+    PreventSunburn: true
+  Equipment:
+    - IRON_AXE HAND
+    - IRON_HELMET HEAD
+    - IRON_CHESTPLATE CHEST
+  Drops:
+    - DefenseEliteDrops
+  Skills:
+    - potion{type=STRENGTH;duration=80;level=2} @self ~onDamaged >0.4
+
+# Elite Chocolate Knight - Balanced elite
+EliteChocolateKnight:
+  Type: HUSK
+  Display: '&6&lエリート チョコナイト'
+  Health: 55
+  Damage: 6
+  Armor: 6
+  Options:
+    MovementSpeed: 0.3
+    AlwaysShowName: true
+    PreventOtherDrops: true
+    PreventSunburn: true
+  Equipment:
+    - IRON_SWORD HAND
+    - CHAINMAIL_HELMET HEAD
+    - IRON_CHESTPLATE CHEST
+  Drops:
+    - DefenseEliteDrops
+  Skills:
+    - potion{type=STRENGTH;duration=60;level=1} @self ~onDamaged >0.3
