@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **GitHub Actions Build**: Fixed build failure in CI/CD pipeline
+  - Removed hardcoded Java path from `gradle.properties` that was specific to local development environment
+  - Made `build.gradle` runServer task use `JAVA_HOME` environment variable instead of hardcoded path
+  - Added Gradle cache to GitHub Actions workflow for faster builds
+  - Added `--no-daemon` flag to prevent Gradle daemon issues in CI environment
+
+
 - **Murderer System Implementation**: Corrected the Murderer trigger condition
   - **Previous (incorrect)**: Players became Murderers when reaching first place or team-killing
   - **Current (correct)**: Players become Murderers when attacking non-Murderer players (PK behavior)

@@ -168,8 +168,9 @@ task runServer(dependsOn: [setupServer, downloadMythicMobs, copyPlugin]) {
             throw new GradleException("Server JAR not found. Run 'setupServer' first.")
         }
 
-        // Java 21のパスを明示的に指定
-        def javaExecutable = '/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home/bin/java'
+        // Use JAVA_HOME if available, otherwise use 'java' from PATH
+        def javaExecutable = System.getenv('JAVA_HOME') ?
+            "${System.getenv('JAVA_HOME')}/bin/java" : 'java'
 
         exec {
             workingDir 'run'
