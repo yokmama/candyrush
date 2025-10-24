@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Made `build.gradle` runServer task use `JAVA_HOME` environment variable instead of hardcoded path
   - Added Gradle cache to GitHub Actions workflow for faster builds
   - Added `--no-daemon` flag to prevent Gradle daemon issues in CI environment
+  - Added `permissions: contents: write` to workflow to allow creating GitHub releases
 
 
 - **Murderer System Implementation**: Corrected the Murderer trigger condition
