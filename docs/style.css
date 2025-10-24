@@ -1,0 +1,455 @@
+/* CSS Variables for theming */
+:root {
+    --primary-color: #ff6b6b;
+    --secondary-color: #4ecdc4;
+    --accent-color: #ffe66d;
+    --dark-bg: #2c3e50;
+    --light-bg: #ecf0f1;
+    --text-dark: #2c3e50;
+    --text-light: #ffffff;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text-dark);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: var(--light-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+/* Header */
+header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #ee5a6f 100%);
+    color: var(--text-light);
+    padding: 30px;
+    box-shadow: var(--box-shadow);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+header h1 {
+    font-size: 2.5em;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Language Switcher */
+.language-switcher {
+    display: flex;
+    gap: 10px;
+}
+
+.lang-btn {
+    padding: 10px 20px;
+    border: 2px solid var(--text-light);
+    background-color: transparent;
+    color: var(--text-light);
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    font-size: 1em;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.lang-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.lang-btn.active {
+    background-color: var(--text-light);
+    color: var(--primary-color);
+}
+
+/* Main Content */
+main {
+    padding: 40px;
+}
+
+.content-section {
+    display: none;
+}
+
+.content-section.active {
+    display: block;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Sections */
+section {
+    margin-bottom: 50px;
+}
+
+section h2 {
+    font-size: 2em;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid var(--accent-color);
+}
+
+section h3 {
+    font-size: 1.5em;
+    color: var(--secondary-color);
+    margin-top: 20px;
+    margin-bottom: 15px;
+}
+
+section p {
+    margin-bottom: 15px;
+    line-height: 1.8;
+}
+
+/* Info Box */
+.info-box {
+    background-color: #fff;
+    border-left: 5px solid var(--secondary-color);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.info-box h3 {
+    margin-top: 0;
+    color: var(--secondary-color);
+}
+
+/* Point Method Cards */
+.point-method {
+    background-color: #fff;
+    padding: 25px;
+    margin: 20px 0;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+}
+
+.point-method:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.point-method h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+}
+
+.point-method.warning {
+    border-left: 5px solid #ff9800;
+    background-color: #fff3e0;
+}
+
+.point-method.warning h3 {
+    color: #ff9800;
+}
+
+.point-method .note {
+    margin-top: 15px;
+    padding: 10px 15px;
+    background-color: rgba(78, 205, 196, 0.1);
+    border-left: 3px solid var(--secondary-color);
+    border-radius: 4px;
+    font-style: italic;
+}
+
+.point-method ul {
+    margin-left: 20px;
+}
+
+/* Lists */
+ul, ol {
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+
+ul li, ol li {
+    margin-bottom: 10px;
+}
+
+.flow-list {
+    counter-reset: step-counter;
+    list-style: none;
+    margin-left: 0;
+}
+
+.flow-list li {
+    counter-increment: step-counter;
+    margin-bottom: 30px;
+    padding-left: 60px;
+    position: relative;
+}
+
+.flow-list li::before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: var(--text-light);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2em;
+    box-shadow: var(--box-shadow);
+}
+
+.flow-list li strong {
+    display: block;
+    font-size: 1.2em;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.flow-list li p {
+    margin-bottom: 10px;
+}
+
+.flow-list li ul {
+    margin-top: 10px;
+}
+
+.tips-list {
+    list-style: none;
+    margin-left: 0;
+}
+
+.tips-list li {
+    background-color: #fff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+}
+
+.tips-list li:hover {
+    transform: translateX(10px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: #fff;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--box-shadow);
+}
+
+table thead {
+    background: linear-gradient(135deg, var(--secondary-color), #45b7af);
+    color: var(--text-light);
+}
+
+table thead th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+}
+
+table tbody tr {
+    border-bottom: 1px solid #ddd;
+    transition: var(--transition);
+}
+
+table tbody tr:hover {
+    background-color: rgba(78, 205, 196, 0.1);
+}
+
+table tbody td {
+    padding: 15px;
+}
+
+table tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Code */
+code {
+    background-color: #f4f4f4;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Footer */
+footer {
+    background-color: var(--dark-bg);
+    color: var(--text-light);
+    text-align: center;
+    padding: 30px;
+}
+
+footer p {
+    margin: 10px 0;
+}
+
+.github-link a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.github-link a:hover {
+    color: var(--text-light);
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    header h1 {
+        font-size: 2em;
+    }
+
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    main {
+        padding: 20px;
+    }
+
+    section h2 {
+        font-size: 1.5em;
+    }
+
+    section h3 {
+        font-size: 1.2em;
+    }
+
+    .flow-list li {
+        padding-left: 50px;
+    }
+
+    .flow-list li::before {
+        width: 35px;
+        height: 35px;
+        font-size: 1em;
+    }
+
+    table {
+        font-size: 0.9em;
+    }
+
+    table thead th,
+    table tbody td {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.5em;
+    }
+
+    .lang-btn {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+
+    main {
+        padding: 15px;
+    }
+
+    section h2 {
+        font-size: 1.3em;
+    }
+
+    .point-method {
+        padding: 15px;
+    }
+
+    table {
+        font-size: 0.8em;
+    }
+
+    table thead th,
+    table tbody td {
+        padding: 8px;
+    }
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background: white;
+        padding: 0;
+    }
+
+    .container {
+        box-shadow: none;
+    }
+
+    .language-switcher {
+        display: none;
+    }
+
+    .point-method,
+    .info-box,
+    .tips-list li,
+    table {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    .content-section {
+        display: block !important;
+    }
+
+    #content-en {
+        page-break-before: always;
+    }
+}

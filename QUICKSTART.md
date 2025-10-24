@@ -10,10 +10,10 @@ A fast-paced team battle game where 4 teams compete to collect the most points i
 
 Earn points by:
 1. **Opening treasure chests** - Find them across the map
-2. **Converting food** - Use `/convert` to turn food into points
+2. **Clicking food in chests** - Auto-converts to points (1-20 each)
 3. **Defending NPCs** - Help them survive monster waves
 4. **Defeating bosses** - Huge point rewards!
-5. **PvP combat** - Steal points as a Murderer
+5. **Avoiding PvP** - Focus on cooperation, not combat
 
 ## 📝 Essential Commands
 
@@ -21,7 +21,7 @@ Earn points by:
 /stats          - View your points and rank
 /stats top      - See top 10 players
 /stats teams    - View team rankings
-/convert        - Turn food into points
+/convert        - Bulk convert food (backup)
 /shop           - Buy items with points
 ```
 
@@ -35,7 +35,7 @@ Earn points by:
 
 ## 💡 Quick Tips
 
-- ✅ **Convert food often** - Don't lose points by dying with items
+- ✅ **Click food in chests** - Auto-converts to points instantly
 - ✅ **Help NPCs** - Defense events = easy points
 - ✅ **Stay in bounds** - World border damages you
 - ✅ **Use the shop** - Buy useful items with points
@@ -48,10 +48,12 @@ Earn points by:
 - Survive 3 waves of monsters (2 minutes)
 - Complete 3 events → Boss spawns!
 
-### Murderer Mode
-- First place gets a red name tag
-- Can steal points by killing others
-- High risk, high reward!
+### Murderer System (PvP Deterrent)
+- Attacking non-Murderer players = severe penalty
+- Red name tag, armor removed, can't re-equip
+- 3-60 minutes duration based on attacks
+- Killing a Murderer = NO penalty (self-defense)
+- **Avoid PvP - cooperate instead!**
 
 ### World Border
 - Red warning at the edge
@@ -63,10 +65,9 @@ Earn points by:
 | What | How | Points |
 |------|-----|--------|
 | Treasure | Open chests | Varies |
-| Food | `/convert` | 1-10 each |
+| Food | Click in chest | 1-20 each |
 | Defense | Help NPC | 50-100 |
 | Boss | Team effort | Massive |
-| PvP | Kill as Murderer | Stolen |
 
 ---
 

@@ -20,9 +20,9 @@ CandyRush is an exciting team-based treasure hunting game where players compete 
    - Watch out for trapped chests that can damage you!
 
 2. **Food Collection**
-   - Collect food items from chests
-   - Use `/convert` to turn all your food into points
-   - Different foods are worth different amounts
+   - **Auto-convert**: Click food in treasure chests to automatically get points
+   - Different foods are worth different amounts (1-20 points each)
+   - Backup: Use `/convert` to bulk convert food from inventory
 
 3. **Defense Events**
    - Help NPCs being attacked by monsters
@@ -35,10 +35,11 @@ CandyRush is an exciting team-based treasure hunting game where players compete 
    - Defeat them for massive point rewards
    - Watch out - they're tough!
 
-5. **PvP Combat**
-   - Become a "Murderer" by getting first place
-   - Steal points from other players
-   - But be careful - everyone can see your red name!
+5. **Murderer System (PvP Deterrent)**
+   - Attacking non-Murderer players triggers severe penalties
+   - Murderers have red names, cannot equip armor, and drop items on death
+   - Killing a Murderer is penalty-free (self-defense)
+   - This game discourages PvP - focus on cooperation!
 
 ## Commands
 
@@ -46,7 +47,7 @@ CandyRush is an exciting team-based treasure hunting game where players compete 
 - `/stats` - View your points and ranking
 - `/stats top` - See the top 10 players
 - `/stats teams` - View team rankings
-- `/convert` - Convert all food in your inventory to points
+- `/convert` - Bulk convert food from inventory (backup feature)
 - `/shop` - Open the item shop to buy useful items
 
 ### Admin Commands
@@ -116,11 +117,14 @@ CandyRush is an exciting team-based treasure hunting game where players compete 
 - Huge point rewards for the entire team
 
 ### Murderer System
-- First place player becomes a "Murderer"
-- Red name tag visible to everyone
-- Can steal points by killing other players
-- Lasts for 10 minutes
-- High risk, high reward!
+- **Trigger**: Attacking non-Murderer players (PK behavior)
+- **Red name tag**: Visible to all players
+- **Armor removal**: All armor is removed and cannot be re-equipped
+- **Target status**: Can be attacked by anyone without penalty
+- **Death penalty**: Drops all equipment
+- **Duration**: 3 minutes initially, +3 minutes per attack, maximum 60 minutes
+- **Self-defense**: Killing a Murderer carries NO penalty
+- **Purpose**: Strong deterrent against PvP - this game encourages cooperation!
 
 ### Shop System
 - Access with `/shop` command (or use the compass item)
@@ -133,12 +137,13 @@ CandyRush is an exciting team-based treasure hunting game where players compete 
 ## Tips for Success
 
 1. **Stick Together**: Team up with your teammates for defense events and boss fights
-2. **Convert Regularly**: Don't carry too much food - convert it to points often
+2. **Chest Food Auto-Converts**: Click food in chests to automatically get points
 3. **Watch for NPCs**: Defense events give great rewards
 4. **Avoid Traps**: Look for signs of trapped chests before opening
 5. **Use the Shop**: Spend points wisely on items that help your team
 6. **Map Awareness**: Stay within the world border and know your surroundings
-7. **First Place Risk**: Being in first place makes you a target (Murderer status)
+7. **Avoid PvP**: This game is designed for cooperation - don't attack other players
+8. **PK Penalty**: Attacking non-Murderer players triggers severe Murderer penalties
 
 ## Language Support
 
@@ -174,7 +179,8 @@ If you have questions or need help:
 | Check stats | `/stats` | View your points and rank |
 | Top players | `/stats top` | See leaderboard |
 | Team ranking | `/stats teams` | View team scores |
-| Convert food | `/convert` | Turn food into points |
+| Convert food | Click in chest | Auto-converts to points |
+| Bulk convert | `/convert` | Convert inventory food |
 | Open shop | `/shop` | Buy items with points |
 | Help NPC | Right-click NPC | Start defense event |
 | Use shop item | Click compass | Quick shop access |
@@ -182,5 +188,4 @@ If you have questions or need help:
 **Point Values:**
 - Treasure chests: Varies by items
 - Defense event: 50-100 points
-- Boss kill: Massive points
-- PvP kill (Murderer): Steal opponent's points
+- Boss kill: Massive points (team effort)

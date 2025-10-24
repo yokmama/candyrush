@@ -97,45 +97,42 @@ public class PvpListener implements Listener {
         TeamColor killerTeam = killerData.getTeamColor();
         TeamColor victimTeam = victimData.getTeamColor();
 
-        // 同じチームかチェック
-        if (killerTeam != null && killerTeam.equals(victimTeam)) {
-            // 被害者がMurdererの場合はペナルティなし
-            if (plugin.getPlayerManager().isMurderer(victim.getUniqueId())) {
-                Bukkit.broadcastMessage(MessageUtils.colorize(
-                    plugin.getConfigManager().getPrefix() +
-                    "&e" + killer.getName() + " &fが Murderer &c" + victim.getName() + " &fを倒しました！"));
-                plugin.getLogger().info(killer.getName() + " killed Murderer " + victim.getName() + " (no penalty)");
-                return;
+        // 被害者がMurdererかチェック
+        boolean victimIsMurderer = plugin.getPlayerManager().isMurderer(victim.getUniqueId());
+
+        if (victimIsMurderer) {
+            // Murdererを倒した場合 - ペナルティなし、通常のキルとして処理
+            killerData.incrementKills();
+            victimData.incrementDeaths();
+
+            plugin.getPlayerManager().savePlayerData(killerData);
+            plugin.getPlayerManager().savePlayerData(victimData);
+
+            if (killerTeam != null) {
+                plugin.getTeamManager().incrementTeamKills(killerTeam);
+            }
+            if (victimTeam != null) {
+                plugin.getTeamManager().incrementTeamDeaths(victimTeam);
             }
 
-            // チームキル - Murderer化
-            applyMurdererPenalty(killer, victim, killerData);
+            // アナウンス
+            Bukkit.broadcastMessage(MessageUtils.colorize(
+                plugin.getConfigManager().getPrefix() +
+                "&e" + killer.getName() + " &fが Murderer &c" + victim.getName() + " &fを倒しました！"));
+            plugin.getLogger().info(killer.getName() + " killed Murderer " + victim.getName() + " (no penalty)");
             return;
         }
 
-        // 通常のPvPキル
-        killerData.incrementKills();
-        victimData.incrementDeaths();
+        // マーダーでない人を攻撃した場合 - PK行為としてMurderer化
+        applyMurdererPenalty(killer, victim, killerData);
 
-        plugin.getPlayerManager().savePlayerData(killerData);
+        // 被害者のデス数のみ増加（キラーのキル数は増やさない）
+        victimData.incrementDeaths();
         plugin.getPlayerManager().savePlayerData(victimData);
 
-        if (killerTeam != null) {
-            plugin.getTeamManager().incrementTeamKills(killerTeam);
-        }
         if (victimTeam != null) {
             plugin.getTeamManager().incrementTeamDeaths(victimTeam);
         }
-
-        // メッセージ表示
-        String killerTeamName = killerTeam != null ? killerTeam.getFormattedName() : "&7無所属";
-        String victimTeamName = victimTeam != null ? victimTeam.getFormattedName() : "&7無所属";
-
-        Bukkit.broadcastMessage(MessageUtils.colorize(
-            killerTeamName + " &f" + killer.getName() + " &7> " +
-            victimTeamName + " &f" + victim.getName()));
-
-        plugin.getLogger().info("PvP: " + killer.getName() + " killed " + victim.getName());
     }
 
     /**
@@ -177,26 +174,26 @@ public class PvpListener implements Listener {
                 "&c&l" + killer.getName() + " &fが &e" + victim.getName() + " &fを攻撃しました！"));
             Bukkit.broadcastMessage(MessageUtils.colorize(
                 plugin.getConfigManager().getPrefix() +
-                "&c&l" + killer.getName() + " がチームキルを行い、Murdererになりました！"));
+                "&c&l" + killer.getName() + " がPK行為を行い、Murdererになりました！"));
             Bukkit.broadcastMessage(MessageUtils.colorize(
                 "&e防具が剥奪され、最大60分間装備できません"));
 
             // キラーへのメッセージ
             MessageUtils.sendTitle(killer,
                 "&4&lMURDERER",
-                "&cチームキルごとに+3分 (最大60分)");
+                "&cPK行為ごとに+3分 (最大60分)");
 
-            plugin.getLogger().warning("Player " + killer.getName() + " became a murderer for the first time (team kill on " + victim.getName() + ")");
+            plugin.getLogger().warning("Player " + killer.getName() + " became a murderer for the first time (PK on " + victim.getName() + ")");
         } else if (shouldAnnounce) {
             // 2回目以降でも、異なるプレイヤーへの攻撃時はアナウンス
             Bukkit.broadcastMessage(MessageUtils.colorize(
                 plugin.getConfigManager().getPrefix() +
                 "&c&l" + killer.getName() + " &fが &e" + victim.getName() + " &fを攻撃しました！"));
 
-            plugin.getLogger().info("Player " + killer.getName() + " team killed " + victim.getName() + " (different victim, murderer time extended by 3 minutes)");
+            plugin.getLogger().info("Player " + killer.getName() + " PK'd " + victim.getName() + " (different victim, murderer time extended by 3 minutes)");
         } else {
             // 同じプレイヤーへの攻撃 - アナウンスなし、時間のみ延長
-            plugin.getLogger().info("Player " + killer.getName() + " team killed " + victim.getName() + " again (murderer time extended by 3 minutes)");
+            plugin.getLogger().info("Player " + killer.getName() + " PK'd " + victim.getName() + " again (murderer time extended by 3 minutes)");
         }
     }
 

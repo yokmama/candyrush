@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CandyRush - User Manual</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>🍬 CandyRush</h1>
+                <div class="language-switcher">
+                    <button id="lang-ja" class="lang-btn active">日本語</button>
+                    <button id="lang-en" class="lang-btn">English</button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- Japanese Content -->
+            <div id="content-ja" class="content-section active">
+                <section class="intro">
+                    <h2>CandyRushとは？</h2>
+                    <p>CandyRushは、4つのチームで競い合うエキサイティングなチーム対戦型トレジャーハントゲームです！チームに参加し、マップを探索し、宝箱を見つけ、モンスターからNPCを守り、壮大なボスと戦って究極のチャンピオンを目指しましょう！</p>
+                </section>
+
+                <section class="game-overview">
+                    <h2>ゲーム概要</h2>
+                    <div class="info-box">
+                        <h3>チーム対戦</h3>
+                        <ul>
+                            <li><strong>4つのチーム</strong>: 赤、青、緑、黄色</li>
+                            <li><strong>協力プレイ</strong>: チームメイトと協力してポイントを獲得</li>
+                            <li><strong>協力重視</strong>: PvPではなく、宝箱や防衛イベントでポイントを集めよう</li>
+                            <li><strong>時間制限</strong>: 各ゲームは20分間</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="earn-points">
+                    <h2>ポイントの獲得方法</h2>
+
+                    <div class="point-method">
+                        <h3>1. 宝箱</h3>
+                        <p>マップに散らばった宝箱を見つけよう</p>
+                        <ul>
+                            <li>通常の宝箱：食料アイテムとポイントを獲得</li>
+                            <li>トラップ宝箱：報酬を獲得できるがダメージも受ける</li>
+                        </ul>
+                    </div>
+
+                    <div class="point-method">
+                        <h3>2. 食料収集</h3>
+                        <p>宝箱から食料アイテムを取得しよう</p>
+                        <ul>
+                            <li><strong>自動変換</strong>：宝箱内の食料をクリックすると自動的にポイントに変換される</li>
+                            <li>食料の種類によってポイントが異なる（1-20ポイント）</li>
+                            <li>補助：<code>/convert</code> コマンドでインベントリ内の食料を一括変換</li>
+                        </ul>
+                    </div>
+
+                    <div class="point-method">
+                        <h3>3. 防衛イベント</h3>
+                        <p>モンスターに襲われているNPCを助けよう</p>
+                        <ul>
+                            <li>敵の波に耐える</li>
+                            <li>成功するとボーナスポイント獲得</li>
+                            <li>3回の防衛イベントをクリアするとボスが出現！</li>
+                        </ul>
+                    </div>
+
+                    <div class="point-method">
+                        <h3>4. ボス戦</h3>
+                        <p>防衛イベントをクリアした後に強力なボスが出現</p>
+                        <ul>
+                            <li>倒すと大量のポイント報酬</li>
+                            <li>チームで協力して倒そう！</li>
+                        </ul>
+                    </div>
+
+                    <div class="point-method warning">
+                        <h3>⚠️ マーダラーシステム（PvP抑止）</h3>
+                        <p>マーダーでないプレイヤーを攻撃すると「マーダラー」状態になります - これは厳しいペナルティです</p>
+                        <ul>
+                            <li><strong>発動条件</strong>：マーダーでないプレイヤーへのPK行為</li>
+                            <li><strong>赤いネームタグ</strong>：全員から見える状態になる</li>
+                            <li><strong>防具剥奪</strong>：防具が外され、装備不可能になる</li>
+                            <li><strong>ターゲットになる</strong>：他プレイヤーからペナルティなしで攻撃される</li>
+                            <li><strong>死亡時のドロップ</strong>：装備がドロップする</li>
+                            <li><strong>持続時間</strong>：初回3分、攻撃ごとに+3分、最大60分</li>
+                            <li><strong>解除条件</strong>：時間経過または死亡</li>
+                        </ul>
+                        <p class="note">💡 マーダーを倒した場合はペナルティなし！正当防衛として扱われます。</p>
+                        <p class="note">💡 このゲームは協力してポイントを集めることを推奨しています。PvPは避けましょう！</p>
+                    </div>
+                </section>
+
+                <section class="commands">
+                    <h2>コマンド</h2>
+
+                    <h3>プレイヤーコマンド</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>コマンド</th>
+                                <th>説明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>/stats</code></td>
+                                <td>あなたのポイントとランキングを表示</td>
+                            </tr>
+                            <tr>
+                                <td><code>/stats top</code></td>
+                                <td>トップ10プレイヤーを表示</td>
+                            </tr>
+                            <tr>
+                                <td><code>/stats teams</code></td>
+                                <td>チームランキングを表示</td>
+                            </tr>
+                            <tr>
+                                <td><code>/convert</code></td>
+                                <td>インベントリ内の食料を一括変換（補助機能）</td>
+                            </tr>
+                            <tr>
+                                <td><code>/shop</code></td>
+                                <td>ショップを開いてアイテムを購入</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>管理者コマンド</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>コマンド</th>
+                                <th>説明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>/candyrush status</code></td>
+                                <td>ゲームの状態を確認</td>
+                            </tr>
+                            <tr>
+                                <td><code>/candyrush start</code></td>
+                                <td>ゲームを強制的に開始</td>
+                            </tr>
+                            <tr>
+                                <td><code>/candyrush stop</code></td>
+                                <td>現在のゲームを停止</td>
+                            </tr>
+                            <tr>
+                                <td><code>/candyrush reset</code></td>
+                                <td>待機状態にリセット</td>
+                            </tr>
+                            <tr>
+                                <td><code>/candyrush setcenter</code></td>
+                                <td>マップの中心を現在位置に設定</td>
+                            </tr>
+                            <tr>
+                                <td><code>/candyrush clearcenter</code></td>
+                                <td>マップの中心をクリア（ランダム選択）</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section class="game-flow">
+                    <h2>ゲームの流れ</h2>
+                    <ol class="flow-list">
+                        <li>
+                            <strong>待機フェーズ</strong>
+                            <p>プレイヤーがサーバーに参加し、自動的にチームに割り当てられます</p>
+                        </li>
+                        <li>
+                            <strong>カウントダウン</strong>
+                            <p>10秒のカウントダウンでテレポートの準備</p>
+                        </li>
+                        <li>
+                            <strong>ゲーム開始</strong>
+                            <p>全プレイヤーがマップの四隅にあるチーム拠点にテレポートします</p>
+                            <ul>
+                                <li>赤チーム：北東の角</li>
+                                <li>青チーム：北西の角</li>
+                                <li>緑チーム：南西の角</li>
+                                <li>黄チーム：南東の角</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>ゲームプレイ（20分間）</strong>
+                            <p>ワールドボーダー内でマップを探索し、ポイントを集めましょう</p>
+                        </li>
+                        <li>
+                            <strong>ゲーム終了</strong>
+                            <p>最終スコアが集計され、勝利チームが発表されます。次のゲームまで5分間のクールダウン</p>
+                        </li>
+                    </ol>
+                </section>
+
+                <section class="tips">
+                    <h2>成功のためのヒント</h2>
+                    <ul class="tips-list">
+                        <li>✅ <strong>チームで協力</strong>：防衛イベントやボス戦ではチームメイトと協力しよう</li>
+                        <li>✅ <strong>宝箱の食料</strong>：宝箱内の食料をクリックすれば自動的にポイントになる</li>
+                        <li>✅ <strong>NPCに注目</strong>：防衛イベントは大きな報酬が得られる</li>
+                        <li>✅ <strong>トラップに注意</strong>：宝箱を開ける前にトラップの兆候を確認しよう</li>
+                        <li>✅ <strong>ショップを活用</strong>：ポイントを賢く使ってチームを助けるアイテムを購入しよう</li>
+                        <li>✅ <strong>マップ意識</strong>：ワールドボーダー内に留まり、周囲を把握しよう</li>
+                        <li>⚠️ <strong>PvPを避ける</strong>：このゲームは協力プレイが目的です。他プレイヤーを攻撃しないようにしましょう</li>
+                        <li>⚠️ <strong>PK行為のペナルティ</strong>：マーダーでないプレイヤーを攻撃するとマーダラー状態（厳しいペナルティ）になる</li>
+                    </ul>
+                </section>
+
+                <section class="reference">
+                    <h2>クイックリファレンス</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>行動</th>
+                                <th>方法</th>
+                                <th>ポイント</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>宝箱</td>
+                                <td>宝箱を開く</td>
+                                <td>アイテムによる</td>
+                            </tr>
+                            <tr>
+                                <td>食料</td>
+                                <td>宝箱でクリック</td>
+                                <td>1-20各</td>
+                            </tr>
+                            <tr>
+                                <td>防衛</td>
+                                <td>NPCを助ける</td>
+                                <td>50-100</td>
+                            </tr>
+                            <tr>
+                                <td>ボス</td>
+                                <td>チームで倒す</td>
+                                <td>大量</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section class="requirements">
+                    <h2>サーバー要件</h2>
+                    <ul>
+                        <li><strong>Minecraftバージョン</strong>: 1.21.5</li>
+                        <li><strong>サーバータイプ</strong>: Paper/Spigot</li>
+                        <li><strong>必須プラグイン</strong>: MythicMobs（ボスとNPC用）</li>
+                        <li><strong>推奨</strong>: 最低2人以上のプレイヤー</li>
+                    </ul>
+                </section>
+            </div>
+
+            <!-- English Content -->
+            <div id="content-en" class="content-section">
+                <section class="intro">
+                    <h2>What is CandyRush?</h2>
+                    <p>CandyRush is an exciting team-based treasure hunting game where players compete to collect the most points! Join one of four teams, explore the map, find treasure chests, defend NPCs from monsters, and battle epic bosses to become the ultimate champion!</p>
+                </section>
+
+                <section class="game-overview">
+                    <h2>Game Overview</h2>
+                    <div class="info-box">
+                        <h3>Team-Based Competition</h3>
+                        <ul>
+                            <li><strong>4 Teams</strong>: Red, Blue, Green, and Yellow</li>
+                            <li><strong>Work Together</strong>: Collaborate with your teammates to earn points</li>
+                            <li><strong>Cooperation Focused</strong>: Collect points through chests and events, not PvP</li>
+                            <li><strong>Time-Limited Rounds</strong>: Each game lasts 20 minutes</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="earn-points">
+                    <h2>How to Earn Points</h2>
+
+                    <div class="point-method">
+                        <h3>1. Treasure Chests</h3>
+                        <p>Find chests scattered across the map</p>
+                        <ul>
+                            <li>Regular chests: Give food items and points</li>
+                            <li>Trapped chests: Can damage you but give rewards</li>
+                        </ul>
+                    </div>
+
+                    <div class="point-method">
+                        <h3>2. Food Collection</h3>
+                        <p>Collect food items from treasure chests</p>
+                        <ul>
+                            <li><strong>Auto-convert</strong>: Clicking food in chests automatically converts it to points</li>
+                            <li>Different foods are worth different amounts (1-20 points)</li>
+                            <li>Backup: <code>/convert</code> command for bulk conversion from inventory</li>
+                        </ul>
+                    </div>
+
+                    <div class="point-method">
+                        <h3>3. Defense Events</h3>
+                        <p>Help NPCs being attacked by monsters</p>
+                        <ul>
+                            <li>Survive waves of enemies</li>
+                            <li>Earn bonus points for successful defense</li>
+                            <li>Complete 3 defense events to summon a boss!</li>
+                        </ul>
+                    </div>
+
+                    <div class="point-method">
+                        <h3>4. Boss Battles</h3>
+                        <p>Powerful bosses appear after completing defense events</p>
+                        <ul>
+                            <li>Defeat them for massive point rewards</li>
+                            <li>Requires team coordination!</li>
+                        </ul>
+                    </div>
+
+                    <div class="point-method warning">
+                        <h3>⚠️ Murderer System (PvP Deterrent)</h3>
+                        <p>Attacking non-Murderer players triggers "Murderer" status - a severe penalty</p>
+                        <ul>
+                            <li><strong>Trigger Condition</strong>: PK (Player Kill) against non-Murderer players</li>
+                            <li><strong>Red Name Tag</strong>: Visible to all players</li>
+                            <li><strong>Armor Removal</strong>: All armor removed and cannot be equipped</li>
+                            <li><strong>Becomes a Target</strong>: Can be attacked by anyone without penalty</li>
+                            <li><strong>Death Penalty</strong>: Drops all equipment on death</li>
+                            <li><strong>Duration</strong>: 3 minutes initially, +3 minutes per attack, max 60 minutes</li>
+                            <li><strong>Release Conditions</strong>: Time expires or death</li>
+                        </ul>
+                        <p class="note">💡 Killing a Murderer has NO penalty! It's treated as self-defense.</p>
+                        <p class="note">💡 This game encourages cooperative play. Avoid PvP combat!</p>
+                    </div>
+                </section>
+
+                <section class="commands">
+                    <h2>Commands</h2>
+
+                    <h3>Player Commands</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>/stats</code></td>
+                                <td>View your points and ranking</td>
+                            </tr>
+                            <tr>
+                                <td><code>/stats top</code></td>
+                                <td>See the top 10 players</td>
+                            </tr>
+                            <tr>
+                                <td><code>/stats teams</code></td>
+                                <td>View team rankings</td>
+                            </tr>
+                            <tr>
+                                <td><code>/convert</code></td>
+                                <td>Bulk convert food from inventory (backup feature)</td>
+                            </tr>
+                            <tr>
+                                <td><code>/shop</code></td>
+                                <td>Open the item shop to buy useful items</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Admin Commands</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>/candyrush status</code></td>
+                                <td>Check game status</td>
+                            </tr>
+                            <tr>
+                                <td><code>/candyrush start</code></td>
+                                <td>Force start the game</td>
+                            </tr>
+                            <tr>
+                                <td><code>/candyrush stop</code></td>
+                                <td>Stop the current game</td>
+                            </tr>
+                            <tr>
+                                <td><code>/candyrush reset</code></td>
+                                <td>Reset to waiting state</td>
+                            </tr>
+                            <tr>
+                                <td><code>/candyrush setcenter</code></td>
+                                <td>Set map center to your location</td>
+                            </tr>
+                            <tr>
+                                <td><code>/candyrush clearcenter</code></td>
+                                <td>Clear map center (random selection)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section class="game-flow">
+                    <h2>Game Flow</h2>
+                    <ol class="flow-list">
+                        <li>
+                            <strong>Waiting Phase</strong>
+                            <p>Players join the server and are automatically assigned to teams</p>
+                        </li>
+                        <li>
+                            <strong>Countdown</strong>
+                            <p>10-second countdown to get ready for teleportation</p>
+                        </li>
+                        <li>
+                            <strong>Game Start</strong>
+                            <p>All players teleport to their team bases at the map corners</p>
+                            <ul>
+                                <li>Red team: Northeast corner</li>
+                                <li>Blue team: Northwest corner</li>
+                                <li>Green team: Southwest corner</li>
+                                <li>Yellow team: Southeast corner</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Playing the Game (20 minutes)</strong>
+                            <p>Explore the map within the world border and collect points</p>
+                        </li>
+                        <li>
+                            <strong>Game End</strong>
+                            <p>Final scores are tallied and the winning team is announced. 5-minute cooldown before next game</p>
+                        </li>
+                    </ol>
+                </section>
+
+                <section class="tips">
+                    <h2>Tips for Success</h2>
+                    <ul class="tips-list">
+                        <li>✅ <strong>Stick Together</strong>: Team up with your teammates for defense events and boss fights</li>
+                        <li>✅ <strong>Chest Food Auto-Converts</strong>: Click food in chests to automatically get points</li>
+                        <li>✅ <strong>Watch for NPCs</strong>: Defense events give great rewards</li>
+                        <li>✅ <strong>Avoid Traps</strong>: Look for signs of trapped chests before opening</li>
+                        <li>✅ <strong>Use the Shop</strong>: Spend points wisely on items that help your team</li>
+                        <li>✅ <strong>Map Awareness</strong>: Stay within the world border and know your surroundings</li>
+                        <li>⚠️ <strong>Avoid PvP</strong>: This game is designed for cooperative play. Don't attack other players</li>
+                        <li>⚠️ <strong>PK Penalty</strong>: Attacking non-Murderer players triggers Murderer status (severe penalty)</li>
+                    </ul>
+                </section>
+
+                <section class="reference">
+                    <h2>Quick Reference</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>How</th>
+                                <th>Points</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Treasure</td>
+                                <td>Open chests</td>
+                                <td>Varies</td>
+                            </tr>
+                            <tr>
+                                <td>Food</td>
+                                <td>Click in chest</td>
+                                <td>1-20 each</td>
+                            </tr>
+                            <tr>
+                                <td>Defense</td>
+                                <td>Help NPC</td>
+                                <td>50-100</td>
+                            </tr>
+                            <tr>
+                                <td>Boss</td>
+                                <td>Team effort</td>
+                                <td>Massive</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section class="requirements">
+                    <h2>Server Requirements</h2>
+                    <ul>
+                        <li><strong>Minecraft Version</strong>: 1.21.5</li>
+                        <li><strong>Server Type</strong>: Paper/Spigot</li>
+                        <li><strong>Required Plugin</strong>: MythicMobs (for bosses and NPCs)</li>
+                        <li><strong>Recommended</strong>: 2+ players minimum</li>
+                    </ul>
+                </section>
+            </div>
+        </main>
+
+        <footer>
+            <p>🍬 Have fun and may the best team win! 🏆</p>
+            <p class="github-link">
+                <a href="https://github.com/yokmama/candyrush" target="_blank">View on GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
