@@ -20,6 +20,7 @@ public class ScoreboardManager {
 
     private final CandyRushPlugin plugin;
     private BukkitTask updateTask;
+    private Scoreboard mainScoreboard; // サーバー全体で共有するメインScoreboard
 
     public ScoreboardManager(CandyRushPlugin plugin) {
         this.plugin = plugin;
@@ -29,75 +30,68 @@ public class ScoreboardManager {
      * マネージャーを初期化
      */
     public void initialize() {
+        // メインScoreboardを作成
+        org.bukkit.scoreboard.ScoreboardManager manager = Bukkit.getScoreboardManager();
+        if (manager != null) {
+            mainScoreboard = manager.getMainScoreboard();
+
+            // murdererチームとnormalチームを作成
+            setupMainScoreboardTeams();
+        }
+
         // スコアボード更新タスクを開始（1秒ごと）
         startUpdateTask();
         plugin.getLogger().info("ScoreboardManager initialized");
     }
 
     /**
-     * プレイヤーにスコアボードを設定
+     * メインScoreboardにmurdererとnormalチームを設定
      */
-    public void setupScoreboard(Player player) {
-        org.bukkit.scoreboard.ScoreboardManager manager = Bukkit.getScoreboardManager();
-        if (manager == null) {
-            return;
-        }
-
-        // 個別Scoreboardを作成（サイドバー表示用）
-        Scoreboard scoreboard = manager.getNewScoreboard();
-
-        // Objectiveを作成
-        Objective objective = scoreboard.registerNewObjective(
-            "candyrush",
-            "dummy",
-            MessageUtils.colorize("&e&l⚡ &6&lCandy Rush &e&l⚡")
-        );
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-
-        // 全チームの色設定をコピー
-        setupTeamColors(scoreboard);
-
-        player.setScoreboard(scoreboard);
-        updatePlayerScoreboard(player);
-    }
-
-    /**
-     * Scoreboardに名前色用のチームを設定（murdererチームとnormalチーム）
-     */
-    private void setupTeamColors(Scoreboard scoreboard) {
+    private void setupMainScoreboardTeams() {
         // Murdererチーム（赤色）
-        Team murdererTeam = scoreboard.getTeam("murderer");
+        Team murdererTeam = mainScoreboard.getTeam("murderer");
         if (murdererTeam == null) {
-            murdererTeam = scoreboard.registerNewTeam("murderer");
+            murdererTeam = mainScoreboard.registerNewTeam("murderer");
         }
         murdererTeam.setColor(org.bukkit.ChatColor.RED);
         murdererTeam.setPrefix("§c");
         murdererTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
 
         // 通常プレイヤーチーム（白色）
-        Team normalTeam = scoreboard.getTeam("normal");
+        Team normalTeam = mainScoreboard.getTeam("normal");
         if (normalTeam == null) {
-            normalTeam = scoreboard.registerNewTeam("normal");
+            normalTeam = mainScoreboard.registerNewTeam("normal");
         }
         normalTeam.setColor(org.bukkit.ChatColor.WHITE);
         normalTeam.setPrefix("§f");
         normalTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
 
-        // 全プレイヤーを適切なチームに追加
-        for (Player target : Bukkit.getOnlinePlayers()) {
-            java.util.Optional<com.candyrush.models.PlayerData> dataOpt =
-                plugin.getPlayerManager().getPlayerData(target.getUniqueId());
+        plugin.getLogger().info("Main scoreboard teams created: murderer (red) and normal (white)");
+    }
 
-            if (dataOpt.isPresent()) {
-                com.candyrush.models.PlayerData data = dataOpt.get();
-                boolean isMurderer = data.isMurdererActive();
-
-                Team targetTeam = isMurderer ? murdererTeam : normalTeam;
-                if (!targetTeam.hasEntry(target.getName())) {
-                    targetTeam.addEntry(target.getName());
-                }
-            }
+    /**
+     * プレイヤーにスコアボードを設定
+     */
+    public void setupScoreboard(Player player) {
+        if (mainScoreboard == null) {
+            return;
         }
+
+        // メインScoreboardを設定
+        player.setScoreboard(mainScoreboard);
+
+        // サイドバー用のObjectiveを作成（まだなければ）
+        Objective objective = mainScoreboard.getObjective("candyrush");
+        if (objective == null) {
+            objective = mainScoreboard.registerNewObjective(
+                "candyrush",
+                "dummy",
+                MessageUtils.colorize("&e&l⚡ &6&lCandy Rush &e&l⚡")
+            );
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        }
+
+        updatePlayerScoreboard(player);
     }
 
     /**

@@ -28,16 +28,8 @@ public class PlayerConnectionListener implements Listener {
 
         var player = event.getPlayer();
 
-        // スコアボードを設定
+        // スコアボードを設定（メインScoreboardを使うので自動的に全員の色が見える）
         plugin.getScoreboardManager().setupScoreboard(player);
-
-        // 既存の全プレイヤーを新プレイヤーのScoreboardに追加
-        // これをしないと新プレイヤーから既存プレイヤーの色が見えない
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            for (Player existingPlayer : Bukkit.getOnlinePlayers()) {
-                plugin.getPlayerManager().updatePlayerTeamColor(existingPlayer);
-            }
-        }, 5L);
 
         // ゲーム状態を表示
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
