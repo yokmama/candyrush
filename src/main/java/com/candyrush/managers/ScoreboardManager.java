@@ -45,28 +45,48 @@ public class ScoreboardManager {
     }
 
     /**
-     * メインScoreboardにmurdererとnormalチームを設定
+     * メインScoreboardに4つのチームカラーを設定
+     * ゲームチーム: BLUE, GREEN, YELLOW (3チーム)
+     * Murdererチーム: RED (殺人者専用)
      */
     private void setupMainScoreboardTeams() {
-        // Murdererチーム（赤色）
-        Team murdererTeam = mainScoreboard.getTeam("murderer");
-        if (murdererTeam == null) {
-            murdererTeam = mainScoreboard.registerNewTeam("murderer");
+        // BLUEチーム（青色）
+        Team blueTeam = mainScoreboard.getTeam("blue");
+        if (blueTeam == null) {
+            blueTeam = mainScoreboard.registerNewTeam("blue");
         }
-        murdererTeam.setColor(org.bukkit.ChatColor.RED);
-        murdererTeam.setPrefix("§c");
-        murdererTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+        blueTeam.setColor(org.bukkit.ChatColor.BLUE);
+        blueTeam.setPrefix("§9");
+        blueTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
 
-        // 通常プレイヤーチーム（白色）
-        Team normalTeam = mainScoreboard.getTeam("normal");
-        if (normalTeam == null) {
-            normalTeam = mainScoreboard.registerNewTeam("normal");
+        // GREENチーム（緑色）
+        Team greenTeam = mainScoreboard.getTeam("green");
+        if (greenTeam == null) {
+            greenTeam = mainScoreboard.registerNewTeam("green");
         }
-        normalTeam.setColor(org.bukkit.ChatColor.WHITE);
-        normalTeam.setPrefix("§f");
-        normalTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+        greenTeam.setColor(org.bukkit.ChatColor.GREEN);
+        greenTeam.setPrefix("§a");
+        greenTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
 
-        plugin.getLogger().info("Main scoreboard teams created: murderer (red) and normal (white)");
+        // YELLOWチーム（黄色）
+        Team yellowTeam = mainScoreboard.getTeam("yellow");
+        if (yellowTeam == null) {
+            yellowTeam = mainScoreboard.registerNewTeam("yellow");
+        }
+        yellowTeam.setColor(org.bukkit.ChatColor.YELLOW);
+        yellowTeam.setPrefix("§e");
+        yellowTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+
+        // REDチーム（赤色 - Murderer専用）
+        Team redTeam = mainScoreboard.getTeam("red");
+        if (redTeam == null) {
+            redTeam = mainScoreboard.registerNewTeam("red");
+        }
+        redTeam.setColor(org.bukkit.ChatColor.RED);
+        redTeam.setPrefix("§c");
+        redTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+
+        plugin.getLogger().info("Main scoreboard teams created: blue, green, yellow (game teams) and red (murderer team)");
     }
 
     /**
@@ -103,46 +123,85 @@ public class ScoreboardManager {
 
     /**
      * メインScoreboardのチーム情報を個別Scoreboardにコピー
+     * 4つのチームカラー (BLUE, GREEN, YELLOW, RED) をすべてコピー
      */
     private void copyTeamsFromMainScoreboard(Scoreboard playerScoreboard) {
         if (mainScoreboard == null) {
             return;
         }
 
-        // murdererチームをコピー
-        Team mainMurdererTeam = mainScoreboard.getTeam("murderer");
-        if (mainMurdererTeam != null) {
-            Team murdererTeam = playerScoreboard.getTeam("murderer");
-            if (murdererTeam == null) {
-                murdererTeam = playerScoreboard.registerNewTeam("murderer");
+        // BLUEチームをコピー
+        Team mainBlueTeam = mainScoreboard.getTeam("blue");
+        if (mainBlueTeam != null) {
+            Team blueTeam = playerScoreboard.getTeam("blue");
+            if (blueTeam == null) {
+                blueTeam = playerScoreboard.registerNewTeam("blue");
             }
-            murdererTeam.setColor(org.bukkit.ChatColor.RED);
-            murdererTeam.setPrefix("§c");
-            murdererTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+            blueTeam.setColor(org.bukkit.ChatColor.BLUE);
+            blueTeam.setPrefix("§9");
+            blueTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
 
             // メンバーをコピー
-            for (String entry : mainMurdererTeam.getEntries()) {
-                if (!murdererTeam.hasEntry(entry)) {
-                    murdererTeam.addEntry(entry);
+            for (String entry : mainBlueTeam.getEntries()) {
+                if (!blueTeam.hasEntry(entry)) {
+                    blueTeam.addEntry(entry);
                 }
             }
         }
 
-        // normalチームをコピー
-        Team mainNormalTeam = mainScoreboard.getTeam("normal");
-        if (mainNormalTeam != null) {
-            Team normalTeam = playerScoreboard.getTeam("normal");
-            if (normalTeam == null) {
-                normalTeam = playerScoreboard.registerNewTeam("normal");
+        // GREENチームをコピー
+        Team mainGreenTeam = mainScoreboard.getTeam("green");
+        if (mainGreenTeam != null) {
+            Team greenTeam = playerScoreboard.getTeam("green");
+            if (greenTeam == null) {
+                greenTeam = playerScoreboard.registerNewTeam("green");
             }
-            normalTeam.setColor(org.bukkit.ChatColor.WHITE);
-            normalTeam.setPrefix("§f");
-            normalTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+            greenTeam.setColor(org.bukkit.ChatColor.GREEN);
+            greenTeam.setPrefix("§a");
+            greenTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
 
             // メンバーをコピー
-            for (String entry : mainNormalTeam.getEntries()) {
-                if (!normalTeam.hasEntry(entry)) {
-                    normalTeam.addEntry(entry);
+            for (String entry : mainGreenTeam.getEntries()) {
+                if (!greenTeam.hasEntry(entry)) {
+                    greenTeam.addEntry(entry);
+                }
+            }
+        }
+
+        // YELLOWチームをコピー
+        Team mainYellowTeam = mainScoreboard.getTeam("yellow");
+        if (mainYellowTeam != null) {
+            Team yellowTeam = playerScoreboard.getTeam("yellow");
+            if (yellowTeam == null) {
+                yellowTeam = playerScoreboard.registerNewTeam("yellow");
+            }
+            yellowTeam.setColor(org.bukkit.ChatColor.YELLOW);
+            yellowTeam.setPrefix("§e");
+            yellowTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+
+            // メンバーをコピー
+            for (String entry : mainYellowTeam.getEntries()) {
+                if (!yellowTeam.hasEntry(entry)) {
+                    yellowTeam.addEntry(entry);
+                }
+            }
+        }
+
+        // REDチームをコピー（Murderer専用）
+        Team mainRedTeam = mainScoreboard.getTeam("red");
+        if (mainRedTeam != null) {
+            Team redTeam = playerScoreboard.getTeam("red");
+            if (redTeam == null) {
+                redTeam = playerScoreboard.registerNewTeam("red");
+            }
+            redTeam.setColor(org.bukkit.ChatColor.RED);
+            redTeam.setPrefix("§c");
+            redTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+
+            // メンバーをコピー
+            for (String entry : mainRedTeam.getEntries()) {
+                if (!redTeam.hasEntry(entry)) {
+                    redTeam.addEntry(entry);
                 }
             }
         }

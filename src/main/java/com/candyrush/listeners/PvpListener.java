@@ -64,19 +64,23 @@ public class PvpListener implements Listener {
         }
 
         // チーム確認 - 同じチーム同士の攻撃は無効
+        // ただし、Murderer状態のプレイヤーはチームから除外されるため例外
         PlayerData attackerData = plugin.getPlayerManager().getOrCreatePlayerData(attacker);
         PlayerData victimData = plugin.getPlayerManager().getOrCreatePlayerData(victim);
 
-        TeamColor attackerTeam = attackerData.getTeamColor();
-        TeamColor victimTeam = victimData.getTeamColor();
+        boolean attackerIsMurderer = attackerData.isMurdererActive();
+        boolean victimIsMurderer = victimData.isMurdererActive();
 
-        if (attackerTeam != null && victimTeam != null && attackerTeam == victimTeam) {
-            event.setCancelled(true);
-            return;
+        // 両者ともMurdererでない場合のみチーム保護を適用
+        if (!attackerIsMurderer && !victimIsMurderer) {
+            TeamColor attackerTeam = attackerData.getTeamColor();
+            TeamColor victimTeam = victimData.getTeamColor();
+
+            if (attackerTeam != null && victimTeam != null && attackerTeam == victimTeam) {
+                event.setCancelled(true);
+                return;
+            }
         }
-
-        // 被害者がMurdererかチェック
-        boolean victimIsMurderer = plugin.getPlayerManager().isMurderer(victim.getUniqueId());
 
         if (victimIsMurderer) {
             // Murdererへの攻撃 - ペナルティなし

@@ -2,27 +2,31 @@
 
 ## What is CandyRush?
 
-CandyRush is an exciting team-based treasure hunting game where players compete to collect the most points! Join one of four teams, explore the map, find treasure chests, defend NPCs from monsters, and battle epic bosses to become the ultimate champion!
+CandyRush is an exciting team-based treasure hunting game where players compete to collect the most points! Join one of three teams, explore the map, find treasure chests, defend NPCs from monsters, and battle epic bosses to become the ultimate champion!
 
 ## Game Overview
 
 ### Team-Based Competition
-- **4 Teams**: Red, Blue, Green, and Yellow
+- **3 Teams**: Blue, Green, and Yellow (Red is reserved for Murderers)
 - **Work Together**: Collaborate with your teammates to earn points
-- **PvP Action**: Battle players from other teams
+- **PvP Deterrent**: Attacking non-Murderers triggers severe Murderer penalties
 - **Time-Limited Rounds**: Each game lasts 20 minutes
 
 ### How to Earn Points
 
 1. **Treasure Chests**
-   - Find chests scattered across the map
-   - Regular chests give food items and points
-   - Watch out for trapped chests that can damage you!
+   - Find 11 different chest types scattered across the map
+   - **Chest/Barrel**: Food items
+   - **Brewing Stand**: Potions
+   - **Furnace types**: Materials
+   - **Dropper/Dispenser**: Equipment
+   - **Hopper**: Utility items
+   - **Trapped Chest**: High-tier equipment but deals 9 hearts damage (near-death!)
 
 2. **Food Collection**
-   - **Auto-convert**: Click food in treasure chests to automatically get points
+   - **Auto-convert in chests**: Click food in treasure chests to get **personal points only**
    - Different foods are worth different amounts (1-20 points each)
-   - Backup: Use `/convert` to bulk convert food from inventory
+   - **Note**: Team points are NOT added (personal points only)
 
 3. **Defense Events**
    - Help NPCs being attacked by monsters
@@ -37,8 +41,10 @@ CandyRush is an exciting team-based treasure hunting game where players compete 
 
 5. **Murderer System (PvP Deterrent)**
    - Attacking non-Murderer players triggers severe penalties
+   - Murderers move to the RED team and are excluded from their original team
    - Murderers have red names, cannot equip armor, and drop items on death
    - Killing a Murderer is penalty-free (self-defense)
+   - Murderer points still contribute to their original team
    - This game discourages PvP - focus on cooperation!
 
 ## Commands
@@ -47,7 +53,6 @@ CandyRush is an exciting team-based treasure hunting game where players compete 
 - `/stats` - View your points and ranking
 - `/stats top` - See the top 10 players
 - `/stats teams` - View team rankings
-- `/convert` - Bulk convert food from inventory (backup feature)
 - `/shop` - Open the item shop to buy useful items
 
 ### Admin Commands
@@ -70,12 +75,7 @@ CandyRush is an exciting team-based treasure hunting game where players compete 
 - Get ready to teleport!
 
 ### 3. Game Start
-- All players teleport to their team bases at the map corners
-- Teams spawn on colored concrete platforms:
-  - Red team: Northeast corner
-  - Blue team: Northwest corner
-  - Green team: Southwest corner
-  - Yellow team: Southeast corner
+- All players teleport to random locations within a 50-block radius of the map center
 
 ### 4. Playing the Game (20 minutes)
 - Explore the map within the world border
@@ -99,9 +99,14 @@ CandyRush is an exciting team-based treasure hunting game where players compete 
 - You cannot escape the play area!
 
 ### Treasure Chests
-- **Regular Chests**: Safe to open, contain food and items
-- **Trapped Chests**: Give rewards but also deal damage
-- Chests respawn after 60 seconds
+CandyRush features 11 different chest types, each with specific loot categories:
+- **Chest/Barrel**: Food items (safe to open)
+- **Brewing Stand**: Potion items (safe to open)
+- **Furnace/Blast Furnace/Smoker**: Material items (safe to open)
+- **Dropper/Dispenser**: Equipment items (safe to open)
+- **Hopper**: Utility items (safe to open)
+- **Trapped Chest**: High-tier equipment rewards but deals 9 hearts damage (near-death!)
+- All chests respawn after 60 seconds
 
 ### Defense Events
 - NPCs call for help when monsters attack
@@ -118,12 +123,14 @@ CandyRush is an exciting team-based treasure hunting game where players compete 
 
 ### Murderer System
 - **Trigger**: Attacking non-Murderer players (PK behavior)
+- **Team Change**: Temporarily moves to RED team, excluded from original team
 - **Red name tag**: Visible to all players
 - **Armor removal**: All armor is removed and cannot be re-equipped
-- **Target status**: Can be attacked by anyone without penalty
+- **Target status**: Can be attacked by anyone (including former teammates) without penalty
 - **Death penalty**: Drops all equipment
 - **Duration**: 3 minutes initially, +3 minutes per attack, maximum 60 minutes
 - **Self-defense**: Killing a Murderer carries NO penalty
+- **Points**: Murderer points still contribute to their original team (not RED team)
 - **Purpose**: Strong deterrent against PvP - this game encourages cooperation!
 
 ### Shop System
@@ -137,13 +144,14 @@ CandyRush is an exciting team-based treasure hunting game where players compete 
 ## Tips for Success
 
 1. **Stick Together**: Team up with your teammates for defense events and boss fights
-2. **Chest Food Auto-Converts**: Click food in chests to automatically get points
+2. **Food Points**: Clicking food in chests gives personal points only (no team points)
 3. **Watch for NPCs**: Defense events give great rewards
-4. **Avoid Traps**: Look for signs of trapped chests before opening
-5. **Use the Shop**: Spend points wisely on items that help your team
-6. **Map Awareness**: Stay within the world border and know your surroundings
-7. **Avoid PvP**: This game is designed for cooperation - don't attack other players
-8. **PK Penalty**: Attacking non-Murderer players triggers severe Murderer penalties
+4. **11 Chest Types**: Different chest types contain different categories of items
+5. **Avoid Trapped Chests**: They give high-tier equipment but deal 9 hearts damage (near-death!)
+6. **Use the Shop**: Spend points wisely on items that help your team
+7. **Map Awareness**: Stay within the world border and know your surroundings
+8. **Avoid PvP**: This game is designed for cooperation - don't attack other players
+9. **PK Penalty**: Attacking non-Murderer players triggers severe Murderer penalties
 
 ## Language Support
 
@@ -179,8 +187,7 @@ If you have questions or need help:
 | Check stats | `/stats` | View your points and rank |
 | Top players | `/stats top` | See leaderboard |
 | Team ranking | `/stats teams` | View team scores |
-| Convert food | Click in chest | Auto-converts to points |
-| Bulk convert | `/convert` | Convert inventory food |
+| Convert food | Click in chest | Personal points only (no team points) |
 | Open shop | `/shop` | Buy items with points |
 | Help NPC | Right-click NPC | Start defense event |
 | Use shop item | Click compass | Quick shop access |

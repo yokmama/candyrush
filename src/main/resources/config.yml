@@ -16,9 +16,10 @@ game:
   center-z: null                    # Z座標（null = ワールドスポーン）
 
 # チーム設定
+# ゲームチーム: BLUE, GREEN, YELLOW (3チーム)
+# RED は Murderer 専用チームとして予約されており、ゲームチームには含まれません
 teams:
   colors:
-    - RED
     - BLUE
     - GREEN
     - YELLOW
@@ -26,7 +27,7 @@ teams:
 # 宝箱設定
 treasure:
   per-chunk: 1                      # 1チャンクあたりの宝箱数
-  trapped-chest-damage: 4.0         # トラップチェストのダメージ（ハート2個）
+  trapped-chest-damage: 18.0        # トラップチェストのダメージ（ハート9個、死ぬ寸前）
   trapped-chest-equipment-chance: 0.7  # 装備出現確率
   respawn-delay-seconds: 60         # 再出現までの時間（秒）
 
@@ -42,6 +43,7 @@ event:
   reward-points-min: 1000           # 報酬ポイント最小
   reward-points-max: 1000           # 報酬ポイント最大
   boss-spawn-threshold: 3           # ボス出現に必要な防衛イベントクリア回数
+  npc-respawn-delay-seconds: 120    # NPCリスポーンまでの時間（秒、2分）
 
 # Murderer設定
 murderer:

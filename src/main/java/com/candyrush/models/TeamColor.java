@@ -6,10 +6,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 
 /**
- * Team colors for the 4 fixed teams
+ * Team colors for the game
+ * RED is reserved for Murderers only (not a regular game team)
+ * Regular game teams: BLUE, GREEN, YELLOW (3 teams)
  */
 public enum TeamColor {
-    RED(NamedTextColor.RED, ChatColor.RED, Color.RED, "赤"),
+    RED(NamedTextColor.RED, ChatColor.RED, Color.RED, "赤"),        // Murderer専用チーム
     BLUE(NamedTextColor.BLUE, ChatColor.BLUE, Color.BLUE, "青"),
     GREEN(NamedTextColor.GREEN, ChatColor.GREEN, Color.GREEN, "緑"),
     YELLOW(NamedTextColor.YELLOW, ChatColor.YELLOW, Color.YELLOW, "黄");

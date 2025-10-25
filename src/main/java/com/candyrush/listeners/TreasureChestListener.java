@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -37,6 +38,64 @@ public class TreasureChestListener implements Listener {
         this.openChests = new ConcurrentHashMap<>();
     }
 
+    /**
+     * 宝箱が壊されたときの処理
+     * アイテムをドロップさせずに宝箱だけを削除する
+     */
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onChestBreak(BlockBreakEvent event) {
+        Block block = event.getBlock();
+
+        // ゲームが進行中でない場合は無視
+        if (!plugin.getGameManager().isGameRunning()) {
+            return;
+        }
+
+        // 宝箱タイプをチェック
+        ChestType chestType = getChestType(block.getType());
+        if (chestType == null) {
+            return;
+        }
+
+        // ゲーム生成チェストかどうかをチェック
+        if (!plugin.getTreasureChestManager().isGameChest(block.getLocation())) {
+            // プレイヤーが設置したチェストなので処理しない（通常通り壊せる）
+            return;
+        }
+
+        Player player = event.getPlayer();
+
+        // アイテムドロップを完全に防ぐ
+        event.setDropItems(false);
+
+        // インベントリの中身を削除（念のため）
+        if (block.getState() instanceof InventoryHolder) {
+            InventoryHolder holder = (InventoryHolder) block.getState();
+            Inventory inventory = holder.getInventory();
+            inventory.clear();
+        }
+
+        // ブロックを削除（通常通り破壊を許可）
+        // event.setCancelled(false); はデフォルト
+
+        // エフェクトを表示
+        Location loc = block.getLocation().add(0.5, 0.5, 0.5);
+        block.getWorld().spawnParticle(Particle.CLOUD, loc, 20, 0.3, 0.3, 0.3, 0.05);
+        block.getWorld().playSound(loc, Sound.BLOCK_WOOD_BREAK, 1.0f, 0.8f);
+
+        // プレイヤーに通知
+        MessageUtils.sendActionBar(player, "&7宝箱を壊した - 中身は消えた...");
+
+        // マネージャーに通知（リスポーン処理のため）
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            plugin.getTreasureChestManager().onChestOpened(block.getLocation());
+        });
+
+        plugin.getLogger().fine("Player " + player.getName() + " broke chest at " +
+                              block.getX() + "," + block.getY() + "," + block.getZ() +
+                              " - items not dropped");
+    }
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onChestOpen(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
@@ -61,13 +120,28 @@ public class TreasureChestListener implements Listener {
             return;
         }
 
+        // ゲーム生成チェストかどうかをチェック
+        if (!plugin.getTreasureChestManager().isGameChest(block.getLocation())) {
+            // プレイヤーが設置したチェストなので処理しない
+            return;
+        }
+
         // トラップチェストの場合、ダメージを与える
         if (chestType == ChestType.TRAPPED_CHEST) {
             handleTrappedChest(player, block);
         }
 
         // 宝箱の位置を記録
-        openChests.put(player.getUniqueId(), block.getLocation());
+        Location chestLocation = block.getLocation();
+        if (!openChests.containsKey(player.getUniqueId()) ||
+            !openChests.get(player.getUniqueId()).equals(chestLocation)) {
+            // 新しい宝箱を開いた - 統計をインクリメント
+            plugin.getPlayerManager().getPlayerData(player.getUniqueId()).ifPresent(data -> {
+                data.incrementChestsOpened();
+                plugin.getPlayerManager().savePlayerData(data);
+            });
+        }
+        openChests.put(player.getUniqueId(), chestLocation);
 
         // 宝箱を開くことを許可（イベントはキャンセルしない）
         // プレイヤーは通常通りインベントリを開ける
@@ -91,6 +165,13 @@ public class TreasureChestListener implements Listener {
         }
 
         Location chestLocation = clickedInventory.getLocation();
+
+        // ゲーム生成チェストかどうかをチェック
+        if (!plugin.getTreasureChestManager().isGameChest(chestLocation)) {
+            // プレイヤーが設置したチェストなので処理しない
+            return;
+        }
+
         Block block = chestLocation.getBlock();
 
         // 宝箱タイプをチェック
@@ -151,6 +232,13 @@ public class TreasureChestListener implements Listener {
         }
 
         Location chestLocation = inventory.getLocation();
+
+        // ゲーム生成チェストかどうかをチェック
+        if (!plugin.getTreasureChestManager().isGameChest(chestLocation)) {
+            // プレイヤーが設置したチェストなので処理しない
+            return;
+        }
+
         Block block = chestLocation.getBlock();
 
         // 宝箱タイプをチェック

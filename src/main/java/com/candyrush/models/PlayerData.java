@@ -13,6 +13,8 @@ public class PlayerData {
     private int points;
     private int pk;      // Player Kill - 一般プレイヤーを殺した回数（累積）
     private int pkk;     // Player Killer Kill - Murdererを倒した回数（累積）
+    private int chestsOpened;  // 開けた宝箱の数（ラウンド毎）
+    private int eventsCompleted;  // 完了したNPCイベントの数（ラウンド毎）
     private boolean isMurderer;
     private long murdererUntil;  // Epoch timestamp
     private long lastSeen;  // Epoch timestamp
@@ -31,6 +33,8 @@ public class PlayerData {
         this.points = 0;
         this.pk = 0;
         this.pkk = 0;
+        this.chestsOpened = 0;
+        this.eventsCompleted = 0;
         this.isMurderer = false;
         this.murdererUntil = 0;
         long now = System.currentTimeMillis() / 1000;
@@ -43,13 +47,16 @@ public class PlayerData {
      * Create a PlayerData instance from database values
      */
     public PlayerData(UUID uuid, String name, TeamColor teamColor, int points, int pk, int pkk,
-                      boolean isMurderer, long murdererUntil, long lastSeen, long createdAt, long updatedAt) {
+                      int chestsOpened, int eventsCompleted, boolean isMurderer, long murdererUntil,
+                      long lastSeen, long createdAt, long updatedAt) {
         this.uuid = uuid;
         this.name = name;
         this.teamColor = teamColor;
         this.points = points;
         this.pk = pk;
         this.pkk = pkk;
+        this.chestsOpened = chestsOpened;
+        this.eventsCompleted = eventsCompleted;
         this.isMurderer = isMurderer;
         this.murdererUntil = murdererUntil;
         this.lastSeen = lastSeen;
@@ -81,6 +88,14 @@ public class PlayerData {
 
     public int getPkk() {
         return pkk;
+    }
+
+    public int getChestsOpened() {
+        return chestsOpened;
+    }
+
+    public int getEventsCompleted() {
+        return eventsCompleted;
     }
 
     public boolean isMurderer() {
@@ -145,6 +160,26 @@ public class PlayerData {
         this.updatedAt = System.currentTimeMillis() / 1000;
     }
 
+    public void setChestsOpened(int chestsOpened) {
+        this.chestsOpened = chestsOpened;
+        this.updatedAt = System.currentTimeMillis() / 1000;
+    }
+
+    public void incrementChestsOpened() {
+        this.chestsOpened++;
+        this.updatedAt = System.currentTimeMillis() / 1000;
+    }
+
+    public void setEventsCompleted(int eventsCompleted) {
+        this.eventsCompleted = eventsCompleted;
+        this.updatedAt = System.currentTimeMillis() / 1000;
+    }
+
+    public void incrementEventsCompleted() {
+        this.eventsCompleted++;
+        this.updatedAt = System.currentTimeMillis() / 1000;
+    }
+
     public void setMurderer(boolean isMurderer) {
         this.isMurderer = isMurderer;
         this.updatedAt = System.currentTimeMillis() / 1000;
@@ -195,6 +230,8 @@ public class PlayerData {
     public void resetForNewGame() {
         this.teamColor = null;
         this.points = 0;
+        this.chestsOpened = 0;
+        this.eventsCompleted = 0;
         this.updatedAt = System.currentTimeMillis() / 1000;
     }
 

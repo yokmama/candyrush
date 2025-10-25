@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Team System Redesign**: Changed from 4-team to 3-team system with RED as Murderer-only team
+  - **Game Teams**: BLUE, GREEN, YELLOW (3 teams for normal gameplay)
+  - **Murderer Team**: RED (exclusive for Murderer状態 players)
+  - Players are now distributed across 3 teams instead of 4
+  - When a player becomes a Murderer, they temporarily move to the RED team
+  - Murderers are excluded from their original team during Murderer状態
+  - Murderers can attack and be attacked by their former teammates
+  - Murderer points still contribute to their original team (not RED team)
+  - Updated all team-related logic in ScoreboardManager, PlayerManager, TeamManager
+  - Updated config.yml to list only 3 game teams (BLUE, GREEN, YELLOW)
+  - Updated PvpListener to exclude Murderers from team protection
+
 ### Fixed
 - **GitHub Actions Build**: Fixed build failure in CI/CD pipeline
   - Removed hardcoded Java path from `gradle.properties` that was specific to local development environment
@@ -31,14 +44,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated `QUICKSTART.md`: Corrected Murderer System description
   - All documentation now accurately describes the Murderer system as a PvP deterrent rather than a reward
 
-- **Food Conversion Documentation**: Clarified food-to-points conversion mechanism
-  - **Primary method**: Food items auto-convert to points when clicked in treasure chests
-  - **Backup method**: `/convert` command for bulk conversion of food already in inventory
-  - Updated all documentation to emphasize auto-conversion as the main feature
-  - Clarified point values: 1-20 points per food item (previously documented as 1-10)
-  - Updated tips to reflect automatic conversion behavior
+- **Treasure Chest System Documentation**: Corrected chest type descriptions to match implementation
+  - **11 chest types**: CHEST, BARREL, BREWING_STAND, FURNACE, BLAST_FURNACE, SMOKER, DROPPER, DISPENSER, HOPPER, TRAPPED_CHEST (ChestType enum)
+  - **Category-based loot**: Each chest type provides items from specific categories (ChestLootCategory enum)
+    - CHEST/BARREL → Food items
+    - BREWING_STAND → Potions
+    - FURNACE types → Materials
+    - DROPPER/DISPENSER → Equipment
+    - HOPPER → Utility items
+    - TRAPPED_CHEST → High-tier equipment + 18.0 damage (9 hearts, near-death!)
+  - Updated `docs/index.html`, `summary.md`, `QUICKSTART.md` to accurately describe all 11 chest types
+  - Previous documentation incorrectly described only "regular chests" and "trapped chests"
+
+- **CRITICAL DOCUMENTATION FIXES**: Removed incorrect references to abolished `/convert` command
+  - **`/convert` command was abolished**: ConvertCommand class does not exist in codebase
+  - **Food conversion reality**: Clicking food in treasure chests converts to **personal points ONLY** (no team points)
+  - Removed all `/convert` command references from `docs/index.html`, `summary.md`, `QUICKSTART.md`
+  - Updated all tips and recommendations to reflect accurate point conversion behavior
+  - Previous documentation incorrectly suggested `/convert` gives both personal and team points
+
+- **Spawn System Documentation Fix**: Corrected player teleportation behavior at game start
+  - **Actual implementation**: Players teleport to random locations within 50-block radius of map center (GameManager.java:600-622)
+  - **Previous (incorrect) documentation**: Stated players teleport to team-specific bases in map corners
+  - Updated `docs/index.html`, `summary.md`, `QUICKSTART.md` to accurately describe random center spawn
+  - Removed incorrect references to "Northwestern", "Southwestern", "Southeastern" team bases
 
 ### Technical Details
+- Modified `TeamColor.java`:
+  - Updated comments to clarify RED is Murderer-only team
+  - Regular game teams: BLUE, GREEN, YELLOW (3 teams)
+
+- Modified `ScoreboardManager.java`:
+  - `setupMainScoreboardTeams()`: Creates 4 scoreboard teams (blue, green, yellow, red) instead of 2 (murderer, normal)
+  - `copyTeamsFromMainScoreboard()`: Copies all 4 team colors to player scoreboards
+  - Each team has distinct color prefix for name tag display
+
+- Modified `PlayerManager.java`:
+  - `updatePlayerTeamColor()`: Assigns scoreboard team based on Murderer status and game team
+  - `getScoreboardTeamName()`: Returns "red" for Murderers, otherwise returns actual team color (blue/green/yellow)
+  - `updateTeamInScoreboard()`: Removes player from all 4 teams before adding to target team
+
+- Modified `TeamManager.java`:
+  - `distributePlayersEvenly()`: Distributes players across 3 game teams (BLUE, GREEN, YELLOW) only
+  - `getSmallestTeam()`: Excludes RED team from balance calculations
+  - Team distribution logs updated to reflect 3 teams
+
+- Modified `config.yml`:
+  - `teams.colors`: Lists only BLUE, GREEN, YELLOW (removed RED from game teams)
+  - Added comments explaining RED is reserved for Murderers
+
+- Modified `PvpListener.java`:
+  - Updated team protection logic to exclude Murderers
+  - Both attacker and victim must not be Murderers for team protection to apply
+  - Murderers can attack and be attacked by their original teammates
+
 - Modified `PvpListener.java`:
   - Changed `handlePvpKill()` method to check if victim is a Murderer
   - If victim is Murderer: no penalty for killer (self-defense)

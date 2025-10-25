@@ -242,24 +242,79 @@ public class TreasureChestManager {
             inv.clear();
 
             Random random = new Random();
-            int itemCount = random.nextInt(4) + 2; // 2-5個
+            int itemCount = Math.min(random.nextInt(4) + 2, inv.getSize()); // 2-5個、ただしインベントリサイズを超えない
 
             java.util.List<String> itemsAdded = new java.util.ArrayList<>();
-            for (int i = 0; i < itemCount; i++) {
-                ItemStack food = getRandomFood(random);
-                int slot = random.nextInt(inv.getSize());
-                inv.setItem(slot, food);
-                itemsAdded.add(food.getType().name() + "x" + food.getAmount());
-            }
+            java.util.Set<Integer> usedSlots = new java.util.HashSet<>(); // 使用済みスロットを記録
 
-            // トラップチェストの場合、装備品を追加
-            if (chestType.isTrapped()) {
-                double equipmentChance = plugin.getConfigManager().getTrappedChestEquipmentChance();
-                if (random.nextDouble() < equipmentChance) {
-                    ItemStack equipment = getRandomEquipment(random);
-                    int slot = random.nextInt(inv.getSize());
-                    inv.setItem(slot, equipment);
-                }
+            // チェストタイプのカテゴリーに応じてアイテムを生成
+            switch (chestType.getLootCategory()) {
+                case FOOD:
+                    for (int i = 0; i < itemCount; i++) {
+                        ItemStack food = getRandomFood(random);
+                        int slot = getAvailableSlot(inv, usedSlots, random);
+                        if (slot >= 0) {
+                            inv.setItem(slot, food);
+                            itemsAdded.add(food.getType().name() + "x" + food.getAmount());
+                        }
+                    }
+                    break;
+
+                case POTION:
+                    for (int i = 0; i < itemCount; i++) {
+                        ItemStack potion = getRandomPotion(random);
+                        int slot = getAvailableSlot(inv, usedSlots, random);
+                        if (slot >= 0) {
+                            inv.setItem(slot, potion);
+                            itemsAdded.add(potion.getType().name() + "x" + potion.getAmount());
+                        }
+                    }
+                    break;
+
+                case EQUIPMENT:
+                    for (int i = 0; i < itemCount; i++) {
+                        ItemStack equipment = getRandomEquipment(random);
+                        int slot = getAvailableSlot(inv, usedSlots, random);
+                        if (slot >= 0) {
+                            inv.setItem(slot, equipment);
+                            itemsAdded.add(equipment.getType().name() + "x" + equipment.getAmount());
+                        }
+                    }
+                    break;
+
+                case MATERIAL:
+                    for (int i = 0; i < itemCount; i++) {
+                        ItemStack material = getRandomMaterial(random);
+                        int slot = getAvailableSlot(inv, usedSlots, random);
+                        if (slot >= 0) {
+                            inv.setItem(slot, material);
+                            itemsAdded.add(material.getType().name() + "x" + material.getAmount());
+                        }
+                    }
+                    break;
+
+                case UTILITY:
+                    for (int i = 0; i < itemCount; i++) {
+                        ItemStack utility = getRandomUtility(random);
+                        int slot = getAvailableSlot(inv, usedSlots, random);
+                        if (slot >= 0) {
+                            inv.setItem(slot, utility);
+                            itemsAdded.add(utility.getType().name() + "x" + utility.getAmount());
+                        }
+                    }
+                    break;
+
+                case TRAP_REWARD:
+                    // トラップチェストは高性能装備
+                    for (int i = 0; i < itemCount; i++) {
+                        ItemStack trapReward = getRandomTrapReward(random);
+                        int slot = getAvailableSlot(inv, usedSlots, random);
+                        if (slot >= 0) {
+                            inv.setItem(slot, trapReward);
+                            itemsAdded.add(trapReward.getType().name() + "x" + trapReward.getAmount());
+                        }
+                    }
+                    break;
             }
 
             // plugin.getLogger().info("Filled " + chestType + " at " + formatLocation(location) +
@@ -365,6 +420,37 @@ public class TreasureChestManager {
     }
 
     /**
+     * 利用可能なスロットを取得（重複を避ける）
+     */
+    private int getAvailableSlot(Inventory inv, java.util.Set<Integer> usedSlots, Random random) {
+        int invSize = inv.getSize();
+
+        // 全スロットが使用済みの場合
+        if (usedSlots.size() >= invSize) {
+            return -1;
+        }
+
+        // 最大10回試行
+        for (int attempt = 0; attempt < 10; attempt++) {
+            int slot = random.nextInt(invSize);
+            if (!usedSlots.contains(slot)) {
+                usedSlots.add(slot);
+                return slot;
+            }
+        }
+
+        // 10回試行しても見つからない場合、未使用スロットを探す
+        for (int slot = 0; slot < invSize; slot++) {
+            if (!usedSlots.contains(slot)) {
+                usedSlots.add(slot);
+                return slot;
+            }
+        }
+
+        return -1; // 利用可能なスロットなし
+    }
+
+    /**
      * ランダムな食料アイテムを取得
      * お菓子系を多めに配置
      */
@@ -399,7 +485,7 @@ public class TreasureChestManager {
     }
 
     /**
-     * ランダムな装備品を取得
+     * ランダムな装備品を取得（鉄・ダイヤ）
      */
     private ItemStack getRandomEquipment(Random random) {
         Material[] equipment = {
@@ -413,6 +499,158 @@ public class TreasureChestManager {
 
         Material item = equipment[random.nextInt(equipment.length)];
         return new ItemStack(item, 1);
+    }
+
+    /**
+     * ランダムなポーション・薬系アイテムを取得
+     */
+    private ItemStack getRandomPotion(Random random) {
+        Material[] potions = {
+            Material.POTION,           // 通常ポーション
+            Material.SPLASH_POTION,    // スプラッシュポーション
+            Material.LINGERING_POTION, // 残留ポーション
+            Material.HONEY_BOTTLE,     // ハチミツ
+            Material.MILK_BUCKET,      // ミルク
+            Material.SUSPICIOUS_STEW   // 怪しげなシチュー
+        };
+
+        Material item = potions[random.nextInt(potions.length)];
+        int amount = 1;
+
+        // ハチミツとシチューは複数個
+        if (item == Material.HONEY_BOTTLE || item == Material.SUSPICIOUS_STEW) {
+            amount = random.nextInt(3) + 1; // 1-3個
+        }
+
+        ItemStack potion = new ItemStack(item, amount);
+
+        // ポーションの場合、効果を追加
+        if (item == Material.POTION || item == Material.SPLASH_POTION || item == Material.LINGERING_POTION) {
+            org.bukkit.inventory.meta.PotionMeta meta = (org.bukkit.inventory.meta.PotionMeta) potion.getItemMeta();
+            if (meta != null) {
+                // ランダムなポーション効果
+                org.bukkit.potion.PotionType[] types = {
+                    org.bukkit.potion.PotionType.HEALING,
+                    org.bukkit.potion.PotionType.REGENERATION,
+                    org.bukkit.potion.PotionType.SWIFTNESS,
+                    org.bukkit.potion.PotionType.STRENGTH,
+                    org.bukkit.potion.PotionType.FIRE_RESISTANCE,
+                    org.bukkit.potion.PotionType.WATER_BREATHING
+                };
+                meta.setBasePotionType(types[random.nextInt(types.length)]);
+                potion.setItemMeta(meta);
+            }
+        }
+
+        return potion;
+    }
+
+    /**
+     * ランダムな素材・燃料系アイテムを取得
+     */
+    private ItemStack getRandomMaterial(Random random) {
+        Material[] materials = {
+            Material.COAL, Material.CHARCOAL,
+            Material.IRON_INGOT, Material.GOLD_INGOT,
+            Material.STICK, Material.STRING,
+            Material.FEATHER, Material.LEATHER,
+            Material.BONE, Material.GUNPOWDER,
+            Material.REDSTONE, Material.GLOWSTONE_DUST,
+            Material.BLAZE_POWDER, Material.MAGMA_CREAM
+        };
+
+        Material item = materials[random.nextInt(materials.length)];
+        int amount = random.nextInt(8) + 4; // 4-11個
+        return new ItemStack(item, amount);
+    }
+
+    /**
+     * ランダムなユーティリティアイテムを取得
+     */
+    private ItemStack getRandomUtility(Random random) {
+        Material[] utilities = {
+            Material.ARROW,
+            Material.ENDER_PEARL,
+            Material.SNOWBALL,
+            Material.EGG,
+            Material.FISHING_ROD,
+            Material.BUCKET,
+            Material.WATER_BUCKET,
+            Material.TORCH,
+            Material.LADDER,
+            Material.COMPASS
+        };
+
+        Material item = utilities[random.nextInt(utilities.length)];
+        int amount = 1;
+
+        // 消耗品は複数個
+        if (item == Material.ARROW) {
+            amount = random.nextInt(16) + 8; // 8-23本
+        } else if (item == Material.SNOWBALL || item == Material.EGG) {
+            amount = random.nextInt(16) + 4; // 4-19個
+        } else if (item == Material.ENDER_PEARL) {
+            amount = random.nextInt(3) + 1; // 1-3個
+        } else if (item == Material.TORCH || item == Material.LADDER) {
+            amount = random.nextInt(16) + 8; // 8-23個
+        }
+
+        return new ItemStack(item, amount);
+    }
+
+    /**
+     * トラップチェスト用の高性能報酬を取得
+     */
+    private ItemStack getRandomTrapReward(Random random) {
+        Material[] rewards = {
+            // ダイヤ装備（高確率）
+            Material.DIAMOND_HELMET, Material.DIAMOND_CHESTPLATE,
+            Material.DIAMOND_LEGGINGS, Material.DIAMOND_BOOTS,
+            Material.DIAMOND_SWORD, Material.DIAMOND_PICKAXE,
+            Material.DIAMOND_AXE,
+            // ネザライト装備（低確率）
+            Material.NETHERITE_HELMET, Material.NETHERITE_CHESTPLATE,
+            Material.NETHERITE_LEGGINGS, Material.NETHERITE_BOOTS,
+            Material.NETHERITE_SWORD,
+            // 特殊装備
+            Material.ELYTRA, Material.TRIDENT,
+            Material.ENCHANTED_GOLDEN_APPLE
+        };
+
+        Material item = rewards[random.nextInt(rewards.length)];
+        int amount = 1;
+
+        // エンチャントされた金のリンゴは複数個
+        if (item == Material.ENCHANTED_GOLDEN_APPLE) {
+            amount = random.nextInt(2) + 1; // 1-2個
+        }
+
+        ItemStack reward = new ItemStack(item, amount);
+
+        // 装備品にランダムエンチャント追加（50%の確率）
+        if (random.nextDouble() < 0.5 && (item.toString().contains("HELMET") ||
+            item.toString().contains("CHESTPLATE") || item.toString().contains("LEGGINGS") ||
+            item.toString().contains("BOOTS") || item.toString().contains("SWORD") ||
+            item.toString().contains("PICKAXE") || item.toString().contains("AXE") ||
+            item.toString().contains("TRIDENT"))) {
+
+            org.bukkit.enchantments.Enchantment[] enchantments = {
+                org.bukkit.enchantments.Enchantment.PROTECTION,
+                org.bukkit.enchantments.Enchantment.SHARPNESS,
+                org.bukkit.enchantments.Enchantment.UNBREAKING
+            };
+
+            org.bukkit.enchantments.Enchantment ench = enchantments[random.nextInt(enchantments.length)];
+            int level = random.nextInt(3) + 1; // レベル1-3
+
+            try {
+                reward.addUnsafeEnchantment(ench, level);
+            } catch (IllegalArgumentException e) {
+                // エンチャント追加失敗は無視
+            }
+        }
+
+        return reward;
     }
 
     /**
@@ -431,6 +669,15 @@ public class TreasureChestManager {
         activeChests.remove(location);
 
         plugin.getLogger().fine("Chest opened at " + formatLocation(location));
+    }
+
+    /**
+     * 指定された位置のチェストがゲーム生成チェストかどうかをチェック
+     * @param location チェストの位置
+     * @return ゲーム生成チェストの場合true、プレイヤー設置の場合false
+     */
+    public boolean isGameChest(Location location) {
+        return activeChests.containsKey(location);
     }
 
     /**

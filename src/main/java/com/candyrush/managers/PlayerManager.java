@@ -228,8 +228,13 @@ public class PlayerManager {
 
     /**
      * プレイヤーのScoreboardチーム色を更新
-     * 注: Scoreboardチームはmurderer（赤）とnormal（白）の2つのみ
-     * ゲームチーム（Red/Blue/Green/Yellow）はPlayerData.teamColorで管理
+     *
+     * チーム構成:
+     * - ゲームチーム: BLUE, GREEN, YELLOW (3チーム)
+     * - Murdererチーム: RED (殺人者専用)
+     *
+     * Murderer状態の場合は元のチームカラーに関係なくREDチームに割り当て
+     * 通常状態の場合はPlayerData.teamColorに基づいてチームに割り当て
      *
      * 重要: メインScoreboardと全プレイヤーの個別Scoreboardの両方を更新
      */
@@ -240,38 +245,66 @@ public class PlayerManager {
         }
 
         PlayerData data = dataOpt.get();
-        boolean isMurderer = data.isMurdererActive();
+        String teamName = getScoreboardTeamName(data);
 
         // 1. メインScoreboardを更新
         org.bukkit.scoreboard.Scoreboard mainScoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-        updateTeamInScoreboard(mainScoreboard, player.getName(), isMurderer);
+        updateTeamInScoreboard(mainScoreboard, player.getName(), teamName);
 
         // 2. 全プレイヤーの個別Scoreboardを更新（これで全員から見える）
         for (Player viewer : Bukkit.getOnlinePlayers()) {
             org.bukkit.scoreboard.Scoreboard scoreboard = viewer.getScoreboard();
             if (scoreboard != null && scoreboard != mainScoreboard) {
-                updateTeamInScoreboard(scoreboard, player.getName(), isMurderer);
+                updateTeamInScoreboard(scoreboard, player.getName(), teamName);
             }
         }
     }
 
     /**
-     * 指定されたScoreboardのチームを更新
+     * PlayerDataからScoreboardチーム名を取得
+     * Murdererの場合は "red"、それ以外はチームカラーに基づく
      */
-    private void updateTeamInScoreboard(org.bukkit.scoreboard.Scoreboard scoreboard, String playerName, boolean isMurderer) {
-        org.bukkit.scoreboard.Team murdererTeam = scoreboard.getTeam("murderer");
-        org.bukkit.scoreboard.Team normalTeam = scoreboard.getTeam("normal");
-
-        // 両方のチームから削除
-        if (murdererTeam != null && murdererTeam.hasEntry(playerName)) {
-            murdererTeam.removeEntry(playerName);
-        }
-        if (normalTeam != null && normalTeam.hasEntry(playerName)) {
-            normalTeam.removeEntry(playerName);
+    private String getScoreboardTeamName(PlayerData data) {
+        if (data.isMurdererActive()) {
+            return "red"; // Murderer状態では常にREDチーム
         }
 
-        // 適切なチームに追加
-        org.bukkit.scoreboard.Team targetTeam = isMurderer ? murdererTeam : normalTeam;
+        TeamColor teamColor = data.getTeamColor();
+        if (teamColor == null) {
+            return "blue"; // デフォルトはBLUE
+        }
+
+        // TeamColorをScoreboardチーム名に変換
+        switch (teamColor) {
+            case RED:
+                return "red";
+            case BLUE:
+                return "blue";
+            case GREEN:
+                return "green";
+            case YELLOW:
+                return "yellow";
+            default:
+                return "blue";
+        }
+    }
+
+    /**
+     * 指定されたScoreboardのチームを更新
+     * 全てのチーム (blue, green, yellow, red) から削除してから指定チームに追加
+     */
+    private void updateTeamInScoreboard(org.bukkit.scoreboard.Scoreboard scoreboard, String playerName, String teamName) {
+        // 全チームから削除
+        String[] allTeams = {"blue", "green", "yellow", "red"};
+        for (String team : allTeams) {
+            org.bukkit.scoreboard.Team scoreboardTeam = scoreboard.getTeam(team);
+            if (scoreboardTeam != null && scoreboardTeam.hasEntry(playerName)) {
+                scoreboardTeam.removeEntry(playerName);
+            }
+        }
+
+        // 指定されたチームに追加
+        org.bukkit.scoreboard.Team targetTeam = scoreboard.getTeam(teamName);
         if (targetTeam != null && !targetTeam.hasEntry(playerName)) {
             targetTeam.addEntry(playerName);
         }
@@ -372,5 +405,18 @@ public class PlayerManager {
      */
     public int getCacheSize() {
         return playerDataCache.size();
+    }
+
+    /**
+     * 全プレイヤーのデータを取得（結果表示用）
+     * @return 全プレイヤーデータのリスト
+     */
+    public List<PlayerData> getAllPlayers() {
+        try {
+            return plugin.getPlayerDataStorage().getTopPlayers(Integer.MAX_VALUE);
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to load all players", e);
+            return new java.util.ArrayList<>();
+        }
     }
 }

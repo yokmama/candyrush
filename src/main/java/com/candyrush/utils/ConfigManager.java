@@ -140,6 +140,10 @@ public class ConfigManager {
         return config.getInt("event.boss-spawn-threshold", 3);
     }
 
+    public int getNpcRespawnDelay() {
+        return config.getInt("event.npc-respawn-delay-seconds", 120);
+    }
+
     // Murderer settings
     public int getMurdererDurationSeconds() {
         return config.getInt("murderer.duration-seconds", 600);

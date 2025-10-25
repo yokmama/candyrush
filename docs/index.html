@@ -23,7 +23,7 @@
             <div id="content-ja" class="content-section active">
                 <section class="intro">
                     <h2>CandyRushとは？</h2>
-                    <p>CandyRushは、4つのチームで競い合うエキサイティングなチーム対戦型トレジャーハントゲームです！チームに参加し、マップを探索し、宝箱を見つけ、モンスターからNPCを守り、壮大なボスと戦って究極のチャンピオンを目指しましょう！</p>
+                    <p>CandyRushは、3つのチームで競い合うエキサイティングなチーム対戦型トレジャーハントゲームです！チームに参加し、マップを探索し、宝箱を見つけ、モンスターからNPCを守り、壮大なボスと戦って究極のチャンピオンを目指しましょう！</p>
                 </section>
 
                 <section class="game-overview">
@@ -31,7 +31,7 @@
                     <div class="info-box">
                         <h3>チーム対戦</h3>
                         <ul>
-                            <li><strong>4つのチーム</strong>: 赤、青、緑、黄色</li>
+                            <li><strong>3つのチーム</strong>: 青、緑、黄色（赤はマーダラー専用チーム）</li>
                             <li><strong>協力プレイ</strong>: チームメイトと協力してポイントを獲得</li>
                             <li><strong>協力重視</strong>: PvPではなく、宝箱や防衛イベントでポイントを集めよう</li>
                             <li><strong>時間制限</strong>: 各ゲームは20分間</li>
@@ -44,10 +44,14 @@
 
                     <div class="point-method">
                         <h3>1. 宝箱</h3>
-                        <p>マップに散らばった宝箱を見つけよう</p>
+                        <p>マップに散らばった11種類の宝箱を見つけよう</p>
                         <ul>
-                            <li>通常の宝箱：食料アイテムとポイントを獲得</li>
-                            <li>トラップ宝箱：報酬を獲得できるがダメージも受ける</li>
+                            <li><strong>チェスト・樽</strong>：食料系アイテム</li>
+                            <li><strong>醸造台</strong>：ポーション系アイテム</li>
+                            <li><strong>かまど類</strong>：素材系アイテム</li>
+                            <li><strong>ドロッパー・ディスペンサー</strong>：装備系アイテム</li>
+                            <li><strong>ホッパー</strong>：ユーティリティ系アイテム</li>
+                            <li><strong>トラップチェスト</strong>：高品質装備が手に入るが、開けると9ハート（死ぬ寸前）のダメージを受ける</li>
                         </ul>
                     </div>
 
@@ -55,9 +59,9 @@
                         <h3>2. 食料収集</h3>
                         <p>宝箱から食料アイテムを取得しよう</p>
                         <ul>
-                            <li><strong>自動変換</strong>：宝箱内の食料をクリックすると自動的にポイントに変換される</li>
+                            <li><strong>自動変換</strong>：宝箱内の食料をクリックすると自動的に<strong>個人ポイント</strong>に変換される</li>
                             <li>食料の種類によってポイントが異なる（1-20ポイント）</li>
-                            <li>補助：<code>/convert</code> コマンドでインベントリ内の食料を一括変換</li>
+                            <li>注意：チームポイントには加算されません（個人ポイントのみ）</li>
                         </ul>
                     </div>
 
@@ -85,12 +89,14 @@
                         <p>マーダーでないプレイヤーを攻撃すると「マーダラー」状態になります - これは厳しいペナルティです</p>
                         <ul>
                             <li><strong>発動条件</strong>：マーダーでないプレイヤーへのPK行為</li>
+                            <li><strong>チーム変更</strong>：一時的にREDチームに移動し、元のチームから除外される</li>
                             <li><strong>赤いネームタグ</strong>：全員から見える状態になる</li>
                             <li><strong>防具剥奪</strong>：防具が外され、装備不可能になる</li>
-                            <li><strong>ターゲットになる</strong>：他プレイヤーからペナルティなしで攻撃される</li>
+                            <li><strong>ターゲットになる</strong>：元のチームメイトを含む全プレイヤーからペナルティなしで攻撃される</li>
                             <li><strong>死亡時のドロップ</strong>：装備がドロップする</li>
+                            <li><strong>ポイント貢献</strong>：マーダラー状態でもポイントは元のチームに加算される</li>
                             <li><strong>持続時間</strong>：初回3分、攻撃ごとに+3分、最大60分</li>
-                            <li><strong>解除条件</strong>：時間経過または死亡</li>
+                            <li><strong>解除条件</strong>：時間経過または死亡で元のチームに復帰</li>
                         </ul>
                         <p class="note">💡 マーダーを倒した場合はペナルティなし！正当防衛として扱われます。</p>
                         <p class="note">💡 このゲームは協力してポイントを集めることを推奨しています。PvPは避けましょう！</p>
@@ -120,10 +126,6 @@
                             <tr>
                                 <td><code>/stats teams</code></td>
                                 <td>チームランキングを表示</td>
-                            </tr>
-                            <tr>
-                                <td><code>/convert</code></td>
-                                <td>インベントリ内の食料を一括変換（補助機能）</td>
                             </tr>
                             <tr>
                                 <td><code>/shop</code></td>
@@ -182,13 +184,7 @@
                         </li>
                         <li>
                             <strong>ゲーム開始</strong>
-                            <p>全プレイヤーがマップの四隅にあるチーム拠点にテレポートします</p>
-                            <ul>
-                                <li>赤チーム：北東の角</li>
-                                <li>青チーム：北西の角</li>
-                                <li>緑チーム：南西の角</li>
-                                <li>黄チーム：南東の角</li>
-                            </ul>
+                            <p>全プレイヤーがマップ中央から半径50ブロック以内のランダムな位置にテレポートします</p>
                         </li>
                         <li>
                             <strong>ゲームプレイ（20分間）</strong>
@@ -205,13 +201,13 @@
                     <h2>成功のためのヒント</h2>
                     <ul class="tips-list">
                         <li>✅ <strong>チームで協力</strong>：防衛イベントやボス戦ではチームメイトと協力しよう</li>
-                        <li>✅ <strong>宝箱の食料</strong>：宝箱内の食料をクリックすれば自動的にポイントになる</li>
+                        <li>✅ <strong>食料ポイント</strong>：宝箱クリックは個人ポイントのみ（チームポイントは加算されません）</li>
                         <li>✅ <strong>NPCに注目</strong>：防衛イベントは大きな報酬が得られる</li>
-                        <li>✅ <strong>トラップに注意</strong>：宝箱を開ける前にトラップの兆候を確認しよう</li>
+                        <li>✅ <strong>宝箱の種類</strong>：11種類の宝箱がそれぞれ異なるアイテムを提供します</li>
                         <li>✅ <strong>ショップを活用</strong>：ポイントを賢く使ってチームを助けるアイテムを購入しよう</li>
                         <li>✅ <strong>マップ意識</strong>：ワールドボーダー内に留まり、周囲を把握しよう</li>
+                        <li>⚠️ <strong>トラップチェスト</strong>：高品質装備が手に入るが9ハート（死ぬ寸前）のダメージ</li>
                         <li>⚠️ <strong>PvPを避ける</strong>：このゲームは協力プレイが目的です。他プレイヤーを攻撃しないようにしましょう</li>
-                        <li>⚠️ <strong>PK行為のペナルティ</strong>：マーダーでないプレイヤーを攻撃するとマーダラー状態（厳しいペナルティ）になる</li>
                     </ul>
                 </section>
 
@@ -265,7 +261,7 @@
             <div id="content-en" class="content-section">
                 <section class="intro">
                     <h2>What is CandyRush?</h2>
-                    <p>CandyRush is an exciting team-based treasure hunting game where players compete to collect the most points! Join one of four teams, explore the map, find treasure chests, defend NPCs from monsters, and battle epic bosses to become the ultimate champion!</p>
+                    <p>CandyRush is an exciting team-based treasure hunting game where players compete to collect the most points! Join one of three teams, explore the map, find treasure chests, defend NPCs from monsters, and battle epic bosses to become the ultimate champion!</p>
                 </section>
 
                 <section class="game-overview">
@@ -273,7 +269,7 @@
                     <div class="info-box">
                         <h3>Team-Based Competition</h3>
                         <ul>
-                            <li><strong>4 Teams</strong>: Red, Blue, Green, and Yellow</li>
+                            <li><strong>3 Teams</strong>: Blue, Green, and Yellow (Red is for Murderers only)</li>
                             <li><strong>Work Together</strong>: Collaborate with your teammates to earn points</li>
                             <li><strong>Cooperation Focused</strong>: Collect points through chests and events, not PvP</li>
                             <li><strong>Time-Limited Rounds</strong>: Each game lasts 20 minutes</li>
@@ -286,10 +282,14 @@
 
                     <div class="point-method">
                         <h3>1. Treasure Chests</h3>
-                        <p>Find chests scattered across the map</p>
+                        <p>Find 11 different types of chests scattered across the map</p>
                         <ul>
-                            <li>Regular chests: Give food items and points</li>
-                            <li>Trapped chests: Can damage you but give rewards</li>
+                            <li><strong>Chest/Barrel</strong>: Food items</li>
+                            <li><strong>Brewing Stand</strong>: Potion items</li>
+                            <li><strong>Furnaces</strong>: Material items</li>
+                            <li><strong>Dropper/Dispenser</strong>: Equipment items</li>
+                            <li><strong>Hopper</strong>: Utility items</li>
+                            <li><strong>Trapped Chest</strong>: High-tier equipment, but deals 9 hearts of damage (near-death)</li>
                         </ul>
                     </div>
 
@@ -297,9 +297,9 @@
                         <h3>2. Food Collection</h3>
                         <p>Collect food items from treasure chests</p>
                         <ul>
-                            <li><strong>Auto-convert</strong>: Clicking food in chests automatically converts it to points</li>
+                            <li><strong>Auto-convert</strong>: Clicking food in chests automatically converts it to <strong>personal points only</strong></li>
                             <li>Different foods are worth different amounts (1-20 points)</li>
-                            <li>Backup: <code>/convert</code> command for bulk conversion from inventory</li>
+                            <li>Note: Team points are NOT added (personal points only)</li>
                         </ul>
                     </div>
 
@@ -327,12 +327,14 @@
                         <p>Attacking non-Murderer players triggers "Murderer" status - a severe penalty</p>
                         <ul>
                             <li><strong>Trigger Condition</strong>: PK (Player Kill) against non-Murderer players</li>
+                            <li><strong>Team Change</strong>: Temporarily moves to RED team, excluded from original team</li>
                             <li><strong>Red Name Tag</strong>: Visible to all players</li>
                             <li><strong>Armor Removal</strong>: All armor removed and cannot be equipped</li>
-                            <li><strong>Becomes a Target</strong>: Can be attacked by anyone without penalty</li>
+                            <li><strong>Becomes a Target</strong>: Can be attacked by anyone (including former teammates) without penalty</li>
                             <li><strong>Death Penalty</strong>: Drops all equipment on death</li>
+                            <li><strong>Points</strong>: Murderer points still contribute to their original team</li>
                             <li><strong>Duration</strong>: 3 minutes initially, +3 minutes per attack, max 60 minutes</li>
-                            <li><strong>Release Conditions</strong>: Time expires or death</li>
+                            <li><strong>Release Conditions</strong>: Time expires or death, returns to original team</li>
                         </ul>
                         <p class="note">💡 Killing a Murderer has NO penalty! It's treated as self-defense.</p>
                         <p class="note">💡 This game encourages cooperative play. Avoid PvP combat!</p>
@@ -362,10 +364,6 @@
                             <tr>
                                 <td><code>/stats teams</code></td>
                                 <td>View team rankings</td>
-                            </tr>
-                            <tr>
-                                <td><code>/convert</code></td>
-                                <td>Bulk convert food from inventory (backup feature)</td>
                             </tr>
                             <tr>
                                 <td><code>/shop</code></td>
@@ -424,13 +422,7 @@
                         </li>
                         <li>
                             <strong>Game Start</strong>
-                            <p>All players teleport to their team bases at the map corners</p>
-                            <ul>
-                                <li>Red team: Northeast corner</li>
-                                <li>Blue team: Northwest corner</li>
-                                <li>Green team: Southwest corner</li>
-                                <li>Yellow team: Southeast corner</li>
-                            </ul>
+                            <p>All players teleport to random locations within a 50-block radius of the map center</p>
                         </li>
                         <li>
                             <strong>Playing the Game (20 minutes)</strong>
@@ -447,13 +439,13 @@
                     <h2>Tips for Success</h2>
                     <ul class="tips-list">
                         <li>✅ <strong>Stick Together</strong>: Team up with your teammates for defense events and boss fights</li>
-                        <li>✅ <strong>Chest Food Auto-Converts</strong>: Click food in chests to automatically get points</li>
+                        <li>✅ <strong>Food Points</strong>: Clicking food in chests gives personal points only (no team points)</li>
                         <li>✅ <strong>Watch for NPCs</strong>: Defense events give great rewards</li>
-                        <li>✅ <strong>Avoid Traps</strong>: Look for signs of trapped chests before opening</li>
+                        <li>✅ <strong>11 Chest Types</strong>: Different chests contain different types of items</li>
                         <li>✅ <strong>Use the Shop</strong>: Spend points wisely on items that help your team</li>
                         <li>✅ <strong>Map Awareness</strong>: Stay within the world border and know your surroundings</li>
+                        <li>⚠️ <strong>Trapped Chests</strong>: High-tier equipment but deals 9 hearts damage (near-death!)</li>
                         <li>⚠️ <strong>Avoid PvP</strong>: This game is designed for cooperative play. Don't attack other players</li>
-                        <li>⚠️ <strong>PK Penalty</strong>: Attacking non-Murderer players triggers Murderer status (severe penalty)</li>
                     </ul>
                 </section>
 

@@ -3,6 +3,7 @@ package com.candyrush.managers;
 import com.candyrush.CandyRushPlugin;
 import com.candyrush.models.GameRound;
 import com.candyrush.models.GameState;
+import com.candyrush.models.PlayerData;
 import com.candyrush.models.Team;
 import com.candyrush.models.TeamColor;
 import com.candyrush.utils.LanguageManager;
@@ -429,12 +430,7 @@ public class GameManager {
     private void announceResults(TeamColor winnerTeam) {
         Bukkit.broadcastMessage(lang.getMessageWithPrefix("game.game_end"));
 
-        if (winnerTeam != null) {
-            Map<String, String> placeholders = new HashMap<>();
-            placeholders.put("team", winnerTeam.getFormattedName());
-            Bukkit.broadcastMessage(lang.getMessageWithPrefix("game.first_place", placeholders));
-        }
-
+        // タイトル表示
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (winnerTeam != null) {
                 MessageUtils.sendTitle(player,
@@ -444,6 +440,99 @@ public class GameManager {
                 MessageUtils.sendTitle(player, lang.getMessage("game.game_end"), "");
             }
         }
+
+        // リザルト表示（少し遅延させて見やすくする）
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            displayGameResults(winnerTeam);
+        }, 60L); // 3秒後
+    }
+
+    /**
+     * ゲームリザルトを詳細に表示
+     */
+    private void displayGameResults(TeamColor winnerTeam) {
+        // === チームランキング ===
+        Bukkit.broadcastMessage("");
+        Bukkit.broadcastMessage(MessageUtils.colorize("&6&l========================================"));
+        Bukkit.broadcastMessage(MessageUtils.colorize("&e&l          チームランキング"));
+        Bukkit.broadcastMessage(MessageUtils.colorize("&6&l========================================"));
+
+        TeamManager teamManager = plugin.getTeamManager();
+        List<TeamColor> gameTeams = java.util.Arrays.asList(TeamColor.BLUE, TeamColor.GREEN, TeamColor.YELLOW);
+        List<Map.Entry<TeamColor, Integer>> teamScores = new java.util.ArrayList<>();
+
+        for (TeamColor team : gameTeams) {
+            int teamPoints = teamManager.getTeamPoints(team);
+            teamScores.add(new java.util.AbstractMap.SimpleEntry<>(team, teamPoints));
+        }
+
+        // ポイント順でソート
+        teamScores.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+
+        int rank = 1;
+        for (Map.Entry<TeamColor, Integer> entry : teamScores) {
+            TeamColor team = entry.getKey();
+            int points = entry.getValue();
+
+            // チームの統計を集計
+            int totalChests = 0;
+            int totalEvents = 0;
+            int totalPk = 0;
+            int totalPkk = 0;
+
+            for (PlayerData data : plugin.getPlayerManager().getAllPlayers()) {
+                if (data.getTeamColor() == team) {
+                    totalChests += data.getChestsOpened();
+                    totalEvents += data.getEventsCompleted();
+                    totalPk += data.getPk();
+                    totalPkk += data.getPkk();
+                }
+            }
+
+            String rankMedal = rank == 1 ? "&6&l" + rank + "位 " : rank == 2 ? "&7&l" + rank + "位 " : "&c&l" + rank + "位 ";
+            String teamDisplay = team.getChatColor() + team.getFormattedName();
+            Bukkit.broadcastMessage(MessageUtils.colorize(rankMedal + teamDisplay));
+            Bukkit.broadcastMessage(MessageUtils.colorize("  &f合計ポイント: &e" + points + "pt"));
+            Bukkit.broadcastMessage(MessageUtils.colorize("  &f宝箱: &a" + totalChests + " &f| イベント: &a" + totalEvents));
+            Bukkit.broadcastMessage(MessageUtils.colorize("  &fPK: &c" + totalPk + " &f| PKK: &b" + totalPkk));
+            rank++;
+        }
+
+        // === 個人ランキング（トップ10） ===
+        Bukkit.broadcastMessage("");
+        Bukkit.broadcastMessage(MessageUtils.colorize("&6&l========================================"));
+        Bukkit.broadcastMessage(MessageUtils.colorize("&e&l          個人ランキング TOP10"));
+        Bukkit.broadcastMessage(MessageUtils.colorize("&6&l========================================"));
+
+        List<PlayerData> allPlayers = plugin.getPlayerManager().getAllPlayers();
+        // ポイント順でソート
+        allPlayers.sort((a, b) -> Integer.compare(b.getPoints(), a.getPoints()));
+
+        int playerRank = 1;
+        for (PlayerData data : allPlayers) {
+            if (playerRank > 10) break;
+
+            String rankDisplay = playerRank == 1 ? "&6&l★" + playerRank + "位 " :
+                               playerRank == 2 ? "&7&l◆" + playerRank + "位 " :
+                               playerRank == 3 ? "&c&l▲" + playerRank + "位 " :
+                               "&f" + playerRank + "位 ";
+
+            TeamColor playerTeam = data.getTeamColor();
+            String teamDisplay = playerTeam != null ? playerTeam.getChatColor() + "" : "&7";
+
+            Bukkit.broadcastMessage(MessageUtils.colorize(
+                rankDisplay + teamDisplay + data.getName() + " &7- &e" + data.getPoints() + "pt"
+            ));
+            Bukkit.broadcastMessage(MessageUtils.colorize(
+                "  &f宝箱: &a" + data.getChestsOpened() + " &f| イベント: &a" + data.getEventsCompleted() +
+                " &f| PK: &c" + data.getPk() + " &f| PKK: &b" + data.getPkk()
+            ));
+
+            playerRank++;
+        }
+
+        Bukkit.broadcastMessage(MessageUtils.colorize("&6&l========================================"));
+        Bukkit.broadcastMessage("");
     }
 
     /**
@@ -791,7 +880,8 @@ public class GameManager {
         // ここでは全プレイヤーのScoreboardを更新するだけ
         for (Player player : Bukkit.getOnlinePlayers()) {
             plugin.getScoreboardManager().setupScoreboard(player);
-            plugin.getPlayerManager().updatePlayerTeamColor(player);
+            // updatePlayerTeamColor は setupScoreboard 内で既に処理されているため不要
+            // 重複呼び出しは発光バグの原因となる可能性があるため削除
         }
 
         plugin.getLogger().info("Setup team colors and name tag visibility for all players");

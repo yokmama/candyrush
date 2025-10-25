@@ -7,24 +7,26 @@ import org.bukkit.Material;
  * Total: 11 types (10 normal + 1 trap)
  */
 public enum ChestType {
-    CHEST(Material.CHEST, false),
-    LARGE_CHEST(Material.CHEST, false),  // Will spawn 2 adjacent chests
-    BARREL(Material.BARREL, false),
-    FURNACE(Material.FURNACE, false),
-    BLAST_FURNACE(Material.BLAST_FURNACE, false),
-    SMOKER(Material.SMOKER, false),
-    BREWING_STAND(Material.BREWING_STAND, false),
-    HOPPER(Material.HOPPER, false),
-    DROPPER(Material.DROPPER, false),
-    DISPENSER(Material.DISPENSER, false),
-    TRAPPED_CHEST(Material.TRAPPED_CHEST, true);  // Special: damage + equipment
+    CHEST(Material.CHEST, false, ChestLootCategory.FOOD),
+    LARGE_CHEST(Material.CHEST, false, ChestLootCategory.FOOD),  // Will spawn 2 adjacent chests
+    BARREL(Material.BARREL, false, ChestLootCategory.FOOD),
+    FURNACE(Material.FURNACE, false, ChestLootCategory.MATERIAL),
+    BLAST_FURNACE(Material.BLAST_FURNACE, false, ChestLootCategory.MATERIAL),
+    SMOKER(Material.SMOKER, false, ChestLootCategory.MATERIAL),
+    BREWING_STAND(Material.BREWING_STAND, false, ChestLootCategory.POTION),
+    HOPPER(Material.HOPPER, false, ChestLootCategory.UTILITY),
+    DROPPER(Material.DROPPER, false, ChestLootCategory.EQUIPMENT),
+    DISPENSER(Material.DISPENSER, false, ChestLootCategory.EQUIPMENT),
+    TRAPPED_CHEST(Material.TRAPPED_CHEST, true, ChestLootCategory.TRAP_REWARD);  // Special: damage + high-tier equipment
 
     private final Material material;
     private final boolean isTrapped;
+    private final ChestLootCategory lootCategory;
 
-    ChestType(Material material, boolean isTrapped) {
+    ChestType(Material material, boolean isTrapped, ChestLootCategory lootCategory) {
         this.material = material;
         this.isTrapped = isTrapped;
+        this.lootCategory = lootCategory;
     }
 
     /**
@@ -41,6 +43,14 @@ public enum ChestType {
      */
     public boolean isTrapped() {
         return isTrapped;
+    }
+
+    /**
+     * Get the loot category for this chest type
+     * @return ChestLootCategory
+     */
+    public ChestLootCategory getLootCategory() {
+        return lootCategory;
     }
 
     /**

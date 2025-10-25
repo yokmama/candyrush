@@ -27,7 +27,9 @@ public class EventNpcManager {
     private final Map<UUID, NpcData> activeNpcs;  // Entity UUID -> NPC Data
     private final Map<UUID, Long> playerHelpMessageCooldown;  // Player UUID -> Last message time
     private final Map<UUID, Integer> playerDefenseClearCount;  // Player UUID -> Clear count
+    private final Map<NpcRespawnData, Long> pendingNpcRespawn;  // NPC respawn location -> respawn time
     private BukkitTask proximityCheckTask;
+    private BukkitTask npcRespawnTask;
     private Integer currentRoundId;
 
     public EventNpcManager(CandyRushPlugin plugin) {
@@ -36,6 +38,7 @@ public class EventNpcManager {
         this.activeNpcs = new ConcurrentHashMap<>();
         this.playerHelpMessageCooldown = new ConcurrentHashMap<>();
         this.playerDefenseClearCount = new ConcurrentHashMap<>();
+        this.pendingNpcRespawn = new ConcurrentHashMap<>();
         this.currentRoundId = null;
     }
 
@@ -44,6 +47,7 @@ public class EventNpcManager {
      */
     public void initialize() {
         startProximityCheckTask();
+        startNpcRespawnTask();
         plugin.getLogger().info("EventNpcManager initialized");
     }
 
@@ -255,6 +259,12 @@ public class EventNpcManager {
 
             plugin.getPlayerManager().addPoints(playerUuid, reward);
 
+            // イベント完了をプレイヤーデータに記録
+            plugin.getPlayerManager().getPlayerData(playerUuid).ifPresent(data -> {
+                data.incrementEventsCompleted();
+                plugin.getPlayerManager().savePlayerData(data);
+            });
+
             // クリア回数をカウント
             int clearCount = playerDefenseClearCount.getOrDefault(playerUuid, 0) + 1;
             playerDefenseClearCount.put(playerUuid, clearCount);
@@ -268,10 +278,16 @@ public class EventNpcManager {
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1.0f, 1.0f);
 
-            // NPCを削除
+            // NPCを削除してリスポーンをスケジュール
             if (npc != null && npc.isValid()) {
-                spawnRewardEffects(npc.getLocation());
+                Location npcLocation = npc.getLocation();
+                spawnRewardEffects(npcLocation);
                 npc.remove();
+
+                // NPCのリスポーンをスケジュール
+                if (event != null && event.npcData != null) {
+                    scheduleNpcRespawn(npcLocation, event.npcData.getNpcType());
+                }
             }
 
             plugin.getLogger().info("Player " + player.getName() + " completed defense event - reward: " + reward + " - clear count: " + clearCount);
@@ -289,10 +305,16 @@ public class EventNpcManager {
 
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_DEATH, 1.0f, 1.0f);
 
-            // NPCを削除
+            // NPCを削除してリスポーンをスケジュール
             if (npc != null && npc.isValid()) {
-                spawnDeathEffects(npc.getLocation());
+                Location npcLocation = npc.getLocation();
+                spawnDeathEffects(npcLocation);
                 npc.remove();
+
+                // NPCのリスポーンをスケジュール
+                if (event != null && event.npcData != null) {
+                    scheduleNpcRespawn(npcLocation, event.npcData.getNpcType());
+                }
             }
 
             plugin.getLogger().info("Player " + player.getName() + " failed defense event");
@@ -317,10 +339,16 @@ public class EventNpcManager {
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 0.8f);
         }
 
-        // NPCを削除
+        // NPCを削除してリスポーンをスケジュール
         if (npc != null && npc.isValid()) {
-            spawnDeathEffects(npc.getLocation());
+            Location npcLocation = npc.getLocation();
+            spawnDeathEffects(npcLocation);
             npc.remove();
+
+            // NPCのリスポーンをスケジュール
+            if (event != null && event.npcData != null) {
+                scheduleNpcRespawn(npcLocation, event.npcData.getNpcType());
+            }
         }
 
         plugin.getLogger().info("Player " + (player != null ? player.getName() : playerUuid) + " abandoned defense event");
@@ -391,6 +419,64 @@ public class EventNpcManager {
     }
 
     /**
+     * NPCリスポーンタスクを開始
+     */
+    private void startNpcRespawnTask() {
+        if (npcRespawnTask != null) {
+            npcRespawnTask.cancel();
+        }
+
+        npcRespawnTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            if (!plugin.getGameManager().isGameRunning()) {
+                return;
+            }
+
+            long currentTime = System.currentTimeMillis();
+            List<NpcRespawnData> toRespawn = new ArrayList<>();
+
+            // リスポーン時間が来たNPCをチェック
+            for (Map.Entry<NpcRespawnData, Long> entry : pendingNpcRespawn.entrySet()) {
+                if (currentTime >= entry.getValue()) {
+                    toRespawn.add(entry.getKey());
+                }
+            }
+
+            // NPCをリスポーン
+            for (NpcRespawnData data : toRespawn) {
+                Location loc = data.getLocation();
+                String npcType = data.getNpcType();
+
+                // チャンクがロードされているかチェック
+                int chunkX = loc.getBlockX() >> 4;
+                int chunkZ = loc.getBlockZ() >> 4;
+
+                if (loc.getWorld().isChunkLoaded(chunkX, chunkZ)) {
+                    // NPCをスポーン
+                    spawnNpc(loc, npcType);
+                    pendingNpcRespawn.remove(data);
+
+                    plugin.getLogger().fine("Respawned NPC at " + formatLocation(loc));
+                }
+            }
+        }, 20L, 20L); // 1秒ごとにチェック
+    }
+
+    /**
+     * NPCをリスポーン待ちリストに追加
+     */
+    private void scheduleNpcRespawn(Location location, String npcType) {
+        // リスポーン遅延時間を取得（秒）
+        int respawnDelay = plugin.getConfigManager().getNpcRespawnDelay();
+        long respawnTime = System.currentTimeMillis() + (respawnDelay * 1000L);
+
+        NpcRespawnData data = new NpcRespawnData(location.clone(), npcType);
+        pendingNpcRespawn.put(data, respawnTime);
+
+        plugin.getLogger().fine("Scheduled NPC respawn at " + formatLocation(location) +
+                              " in " + respawnDelay + " seconds");
+    }
+
+    /**
      * プレイヤーの近くにボスを召喚
      */
     private void spawnBossForPlayer(Player player) {
@@ -443,6 +529,7 @@ public class EventNpcManager {
         activeNpcs.clear();
         playerHelpMessageCooldown.clear();
         playerDefenseClearCount.clear();
+        pendingNpcRespawn.clear();
 
         plugin.getLogger().info("All event NPCs removed");
     }
@@ -463,6 +550,11 @@ public class EventNpcManager {
         if (proximityCheckTask != null) {
             proximityCheckTask.cancel();
             proximityCheckTask = null;
+        }
+
+        if (npcRespawnTask != null) {
+            npcRespawnTask.cancel();
+            npcRespawnTask = null;
         }
 
         plugin.getLogger().info("EventNpcManager shutdown complete");
@@ -583,6 +675,40 @@ public class EventNpcManager {
     }
 
     /**
+     * NPCリスポーンデータクラス
+     */
+    private static class NpcRespawnData {
+        private final Location location;
+        private final String npcType;
+
+        public NpcRespawnData(Location location, String npcType) {
+            this.location = location;
+            this.npcType = npcType;
+        }
+
+        public Location getLocation() {
+            return location;
+        }
+
+        public String getNpcType() {
+            return npcType;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            NpcRespawnData that = (NpcRespawnData) o;
+            return location.equals(that.location) && npcType.equals(that.npcType);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(location, npcType);
+        }
+    }
+
+    /**
      * 防衛イベントクラス
      */
     private class DefenseEvent {
@@ -598,6 +724,7 @@ public class EventNpcManager {
         private int currentWave;
         private int elapsedSeconds;
         private BukkitTask task;
+        private boolean distanceWarningShown;
 
         public DefenseEvent(Player player, Entity npc, Location npcLocation, NpcData npcData) {
             this.player = player;
@@ -611,6 +738,7 @@ public class EventNpcManager {
             this.totalDuration = plugin.getConfigManager().getDefenseDurationSeconds();
             this.currentWave = 0;
             this.elapsedSeconds = 0;
+            this.distanceWarningShown = false;
         }
 
         public void start() {
@@ -632,8 +760,23 @@ public class EventNpcManager {
                     return;
                 }
 
-                // プレイヤーが離れすぎた場合（30ブロック以上）
-                if (player.getLocation().distance(npcLocation) > 30) {
+                // プレイヤーとNPCの距離をチェック
+                // ハメ技防止: NPCの近くで戦う必要がある
+                double distance = player.getLocation().distance(npcLocation);
+
+                // 警告ゾーン（15-20ブロック）
+                if (distance > 15 && distance <= 20) {
+                    if (!distanceWarningShown) {
+                        MessageUtils.sendMessage(player, "&e&l⚠ 警告: NPCから離れすぎています！");
+                        MessageUtils.sendMessage(player, "&c20ブロック以上離れるとイベントが中止されます！");
+                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.5f);
+                        distanceWarningShown = true;
+                    }
+                } else if (distance <= 15) {
+                    // プレイヤーが戻ってきた場合は警告をリセット
+                    distanceWarningShown = false;
+                } else if (distance > 20) {
+                    // 20ブロック以上離れた場合はイベント中止
                     onPlayerAbandon(player.getUniqueId(), npc);
                     return;
                 }
@@ -648,8 +791,8 @@ public class EventNpcManager {
                 for (UUID monsterUuid : spawnedMonsters) {
                     Entity monster = Bukkit.getEntity(monsterUuid);
                     if (monster != null && monster.isValid()) {
-                        double distance = monster.getLocation().distance(npcLocation);
-                        if (distance > 16.0) {
+                        double monsterDistance = monster.getLocation().distance(npcLocation);
+                        if (monsterDistance > 16.0) {
                             // NPCの周辺にランダムにテレポート（5-8ブロック範囲）
                             Random random = new Random();
                             double angle = random.nextDouble() * Math.PI * 2;
@@ -663,7 +806,7 @@ public class EventNpcManager {
 
                             if (plugin.getConfigManager().isDebugEnabled()) {
                                 plugin.getLogger().info("Monster teleported back to NPC - was " +
-                                    String.format("%.1f", distance) + " blocks away");
+                                    String.format("%.1f", monsterDistance) + " blocks away");
                             }
                         }
                     }

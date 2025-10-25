@@ -44,14 +44,16 @@ public class PlayerDataStorageImpl implements PlayerDataStorage {
         // Note: DBカラム名は kills/deaths だが、実際の意味は pk/pkk
         // kills = PK (Player Kill), deaths = PKK (Player Killer Kill)
         String sql = "INSERT INTO players (uuid, name, team_color, points, kills, deaths, " +
-                    "is_murderer, murderer_until, last_seen, created_at, updated_at) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                    "chests_opened, events_completed, is_murderer, murderer_until, last_seen, created_at, updated_at) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
                     "ON CONFLICT(uuid) DO UPDATE SET " +
                     "name = excluded.name, " +
                     "team_color = excluded.team_color, " +
                     "points = excluded.points, " +
                     "kills = excluded.kills, " +
                     "deaths = excluded.deaths, " +
+                    "chests_opened = excluded.chests_opened, " +
+                    "events_completed = excluded.events_completed, " +
                     "is_murderer = excluded.is_murderer, " +
                     "murderer_until = excluded.murderer_until, " +
                     "last_seen = excluded.last_seen, " +
@@ -66,11 +68,13 @@ public class PlayerDataStorageImpl implements PlayerDataStorage {
             stmt.setInt(4, playerData.getPoints());
             stmt.setInt(5, playerData.getPk());     // kills -> PK
             stmt.setInt(6, playerData.getPkk());    // deaths -> PKK
-            stmt.setInt(7, playerData.isMurderer() ? 1 : 0);
-            stmt.setLong(8, playerData.getMurdererUntil());
-            stmt.setLong(9, playerData.getLastSeen());
-            stmt.setLong(10, playerData.getCreatedAt());
-            stmt.setLong(11, playerData.getUpdatedAt());
+            stmt.setInt(7, playerData.getChestsOpened());
+            stmt.setInt(8, playerData.getEventsCompleted());
+            stmt.setInt(9, playerData.isMurderer() ? 1 : 0);
+            stmt.setLong(10, playerData.getMurdererUntil());
+            stmt.setLong(11, playerData.getLastSeen());
+            stmt.setLong(12, playerData.getCreatedAt());
+            stmt.setLong(13, playerData.getUpdatedAt());
 
             stmt.executeUpdate();
         }
@@ -207,13 +211,15 @@ public class PlayerDataStorageImpl implements PlayerDataStorage {
         // Note: DBカラム名は kills/deaths だが、実際の意味は pk/pkk
         int pk = rs.getInt("kills");      // kills -> PK
         int pkk = rs.getInt("deaths");    // deaths -> PKK
+        int chestsOpened = rs.getInt("chests_opened");
+        int eventsCompleted = rs.getInt("events_completed");
         boolean isMurderer = rs.getInt("is_murderer") == 1;
         long murdererUntil = rs.getLong("murderer_until");
         long lastSeen = rs.getLong("last_seen");
         long createdAt = rs.getLong("created_at");
         long updatedAt = rs.getLong("updated_at");
 
-        return new PlayerData(uuid, name, teamColor, points, pk, pkk,
+        return new PlayerData(uuid, name, teamColor, points, pk, pkk, chestsOpened, eventsCompleted,
                             isMurderer, murdererUntil, lastSeen, createdAt, updatedAt);
     }
 }

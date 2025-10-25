@@ -74,8 +74,10 @@ public class DatabaseInitializer {
                 "    name TEXT NOT NULL," +
                 "    team_color TEXT," +  // RED, BLUE, GREEN, YELLOW, or NULL
                 "    points INTEGER DEFAULT 0," +
-                "    kills INTEGER DEFAULT 0," +
-                "    deaths INTEGER DEFAULT 0," +
+                "    kills INTEGER DEFAULT 0," +  // PK (Player Kill)
+                "    deaths INTEGER DEFAULT 0," +  // PKK (Player Killer Kill)
+                "    chests_opened INTEGER DEFAULT 0," +  // Number of chests opened (per round)
+                "    events_completed INTEGER DEFAULT 0," +  // Number of NPC events completed (per round)
                 "    is_murderer INTEGER DEFAULT 0," +  // 0 = false, 1 = true
                 "    murderer_until INTEGER," +  // Epoch timestamp when murderer status expires
                 "    last_seen INTEGER," +  // Epoch timestamp of last login
@@ -83,6 +85,18 @@ public class DatabaseInitializer {
                 "    updated_at INTEGER NOT NULL" +  // Epoch timestamp of last update
                 ")"
             );
+
+            // Add chests_opened and events_completed columns if they don't exist (migration)
+            try {
+                stmt.executeUpdate("ALTER TABLE players ADD COLUMN chests_opened INTEGER DEFAULT 0");
+            } catch (SQLException e) {
+                // Column already exists, ignore
+            }
+            try {
+                stmt.executeUpdate("ALTER TABLE players ADD COLUMN events_completed INTEGER DEFAULT 0");
+            } catch (SQLException e) {
+                // Column already exists, ignore
+            }
 
             // Game rounds table - tracks game sessions
             stmt.executeUpdate(

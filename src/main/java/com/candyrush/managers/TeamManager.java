@@ -105,7 +105,8 @@ public class TeamManager {
     }
 
     /**
-     * 全プレイヤーを均等に4チームに振り分け
+     * 全プレイヤーを均等に3チーム（BLUE, GREEN, YELLOW）に振り分け
+     * RED チームは Murderer 専用のため除外
      */
     public void distributePlayersEvenly(Collection<Player> players) {
         // 全チームをリセット
@@ -114,33 +115,45 @@ public class TeamManager {
         List<Player> playerList = new ArrayList<>(players);
         Collections.shuffle(playerList); // ランダムに並び替え
 
-        TeamColor[] colors = TeamColor.values();
+        // ゲームチームのみ (RED を除外)
+        TeamColor[] gameTeams = {TeamColor.BLUE, TeamColor.GREEN, TeamColor.YELLOW};
         int teamIndex = 0;
 
         // 順番にチームに割り当て
         for (Player player : playerList) {
-            TeamColor color = colors[teamIndex % colors.length];
+            TeamColor color = gameTeams[teamIndex % gameTeams.length];
             assignPlayerToTeam(player.getUniqueId(), color);
             teamIndex++;
         }
 
-        plugin.getLogger().info("Distributed " + players.size() + " players across 4 teams");
+        plugin.getLogger().info("Distributed " + players.size() + " players across 3 teams (BLUE, GREEN, YELLOW)");
 
-        // 各チームの人数をログ
-        for (TeamColor color : TeamColor.values()) {
+        // 各ゲームチームの人数をログ
+        for (TeamColor color : gameTeams) {
             Team team = teams.get(color);
             plugin.getLogger().info(color + " team: " + team.getPlayerCount() + " players");
         }
     }
 
     /**
-     * 最も人数が少ないチームを取得（バランス調整用）
+     * 最も人数が少ないゲームチームを取得（バランス調整用）
+     * RED チームは Murderer 専用のため除外
      */
     public TeamColor getSmallestTeam() {
-        return teams.values().stream()
-                .min(Comparator.comparingInt(Team::getPlayerCount))
-                .map(Team::getColor)
-                .orElse(TeamColor.RED); // デフォルトは赤
+        TeamColor[] gameTeams = {TeamColor.BLUE, TeamColor.GREEN, TeamColor.YELLOW};
+
+        TeamColor smallest = TeamColor.BLUE;
+        int minCount = Integer.MAX_VALUE;
+
+        for (TeamColor color : gameTeams) {
+            Team team = teams.get(color);
+            if (team != null && team.getPlayerCount() < minCount) {
+                minCount = team.getPlayerCount();
+                smallest = color;
+            }
+        }
+
+        return smallest;
     }
 
     /**
