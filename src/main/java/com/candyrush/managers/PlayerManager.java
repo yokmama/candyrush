@@ -99,6 +99,9 @@ public class PlayerManager {
         data.updateLastSeen();
         savePlayerData(data);
 
+        // Murderer状態の場合は名前の色を更新
+        updatePlayerNameColor(player);
+
         plugin.getLogger().fine("Player joined: " + player.getName() + " (" + player.getUniqueId() + ")");
     }
 
@@ -203,8 +206,7 @@ public class PlayerManager {
             // 名前の色を白に戻す
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                player.setDisplayName("§f" + player.getName());
-                player.setPlayerListName("§f" + player.getName());
+                setPlayerNameWhite(player);
             }
         });
     }
@@ -214,11 +216,56 @@ public class PlayerManager {
      */
     public void updatePlayerNameColor(Player player) {
         if (isMurderer(player.getUniqueId())) {
-            player.setDisplayName("§c" + player.getName());
-            player.setPlayerListName("§c" + player.getName());
+            setPlayerNameRed(player);
         } else {
-            player.setDisplayName("§f" + player.getName());
-            player.setPlayerListName("§f" + player.getName());
+            setPlayerNameWhite(player);
+        }
+    }
+
+    /**
+     * プレイヤーの名前を赤色に設定（ディスプレイネーム、タブリスト、頭上の名前）
+     */
+    private void setPlayerNameRed(Player player) {
+        // ディスプレイネームとタブリストの名前
+        player.setDisplayName("§c" + player.getName());
+        player.setPlayerListName("§c" + player.getName());
+
+        // 頭上の名前（NameTag）を赤くするためにScoreboardのTeamを使用
+        org.bukkit.scoreboard.Scoreboard scoreboard = player.getScoreboard();
+        if (scoreboard == null || scoreboard == Bukkit.getScoreboardManager().getMainScoreboard()) {
+            scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+            player.setScoreboard(scoreboard);
+        }
+
+        // Murdererチームを取得または作成
+        org.bukkit.scoreboard.Team murdererTeam = scoreboard.getTeam("murderer");
+        if (murdererTeam == null) {
+            murdererTeam = scoreboard.registerNewTeam("murderer");
+            murdererTeam.setColor(org.bukkit.ChatColor.RED);
+            murdererTeam.setPrefix("§c");
+        }
+
+        // プレイヤーをMurdererチームに追加
+        if (!murdererTeam.hasEntry(player.getName())) {
+            murdererTeam.addEntry(player.getName());
+        }
+    }
+
+    /**
+     * プレイヤーの名前を白色に戻す
+     */
+    private void setPlayerNameWhite(Player player) {
+        // ディスプレイネームとタブリストの名前
+        player.setDisplayName("§f" + player.getName());
+        player.setPlayerListName("§f" + player.getName());
+
+        // Scoreboardのチームから削除
+        org.bukkit.scoreboard.Scoreboard scoreboard = player.getScoreboard();
+        if (scoreboard != null) {
+            org.bukkit.scoreboard.Team murdererTeam = scoreboard.getTeam("murderer");
+            if (murdererTeam != null && murdererTeam.hasEntry(player.getName())) {
+                murdererTeam.removeEntry(player.getName());
+            }
         }
     }
 
