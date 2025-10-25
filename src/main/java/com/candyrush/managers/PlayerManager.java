@@ -187,6 +187,12 @@ public class PlayerManager {
             }
 
             savePlayerData(data);
+
+            // Scoreboardチームを更新（murdererチームに移動）
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null && player.isOnline()) {
+                updatePlayerTeamColor(player);
+            }
         });
 
         return isFirstTime[0];
@@ -200,10 +206,9 @@ public class PlayerManager {
             data.clearMurderer();
             savePlayerData(data);
 
-            // 発光エフェクトを削除してnormalチームに戻す
+            // normalチームに戻す
             Player player = Bukkit.getPlayer(uuid);
             if (player != null && player.isOnline()) {
-                player.setGlowing(false);
                 updatePlayerTeamColor(player);
             }
         });

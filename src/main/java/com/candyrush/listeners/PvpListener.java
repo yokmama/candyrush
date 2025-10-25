@@ -213,12 +213,6 @@ public class PvpListener implements Listener {
             // 防具を剥奪
             removeArmor(killer);
 
-            // 発光エフェクトを追加（赤色）
-            killer.setGlowing(true);
-
-            // Scoreboardチームを更新（murdererチームに移動）
-            plugin.getPlayerManager().updatePlayerTeamColor(killer);
-
             // ボスマネージャーに通知（3回でボス召喚）
             plugin.getBossManager().onPlayerBecomeMurderer(killer.getUniqueId());
 

@@ -266,9 +266,8 @@ public class GameManager {
             player.setHealth(player.getMaxHealth()); // 体力を最大に
             player.setFoodLevel(20); // 空腹度を最大に
             player.setSaturation(20.0f); // 満腹度も最大に
-            player.setGlowing(false); // 発光をリセット
 
-            // Murdererステータスをクリア
+            // Murdererステータスをクリア（これでnormalチームに戻る）
             plugin.getPlayerManager().clearMurderer(player.getUniqueId());
 
             // ショップアイテムを付与（スロット9番目）
