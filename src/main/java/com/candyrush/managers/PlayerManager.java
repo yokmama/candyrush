@@ -199,6 +199,12 @@ public class PlayerManager {
         getPlayerData(uuid).ifPresent(data -> {
             data.clearMurderer();
             savePlayerData(data);
+
+            // 発光エフェクトを削除
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null && player.isOnline()) {
+                player.setGlowing(false);
+            }
         });
     }
 
@@ -209,6 +215,40 @@ public class PlayerManager {
         return getPlayerData(uuid)
                 .map(PlayerData::isMurdererActive)
                 .orElse(false);
+    }
+
+    /**
+     * プレイヤーのScoreboardチーム色を更新
+     */
+    public void updatePlayerTeamColor(Player player) {
+        Optional<PlayerData> dataOpt = getPlayerData(player.getUniqueId());
+        if (!dataOpt.isPresent()) {
+            return;
+        }
+
+        PlayerData data = dataOpt.get();
+        TeamColor teamColor = data.getTeamColor();
+
+        // プレイヤーの全てのScoreboardチームから削除
+        org.bukkit.scoreboard.Scoreboard scoreboard = player.getScoreboard();
+        if (scoreboard != null) {
+            for (TeamColor tc : TeamColor.values()) {
+                String teamName = tc.name().toLowerCase();
+                org.bukkit.scoreboard.Team team = scoreboard.getTeam(teamName);
+                if (team != null && team.hasEntry(player.getName())) {
+                    team.removeEntry(player.getName());
+                }
+            }
+
+            // 新しいチームに追加
+            if (teamColor != null) {
+                String teamName = teamColor.name().toLowerCase();
+                org.bukkit.scoreboard.Team team = scoreboard.getTeam(teamName);
+                if (team != null && !team.hasEntry(player.getName())) {
+                    team.addEntry(player.getName());
+                }
+            }
+        }
     }
 
     /**

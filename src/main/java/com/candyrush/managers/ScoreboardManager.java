@@ -43,7 +43,10 @@ public class ScoreboardManager {
             return;
         }
 
+        // 個別Scoreboardを作成（サイドバー表示用）
         Scoreboard scoreboard = manager.getNewScoreboard();
+
+        // Objectiveを作成
         Objective objective = scoreboard.registerNewObjective(
             "candyrush",
             "dummy",
@@ -51,8 +54,54 @@ public class ScoreboardManager {
         );
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
+        // 全チームの色設定をコピー
+        setupTeamColors(scoreboard);
+
         player.setScoreboard(scoreboard);
         updatePlayerScoreboard(player);
+    }
+
+    /**
+     * Scoreboardにチーム色を設定
+     */
+    private void setupTeamColors(Scoreboard scoreboard) {
+        // 各TeamColorに対応するScoreboardチームを作成
+        for (com.candyrush.models.TeamColor teamColor : com.candyrush.models.TeamColor.values()) {
+            String teamName = teamColor.name().toLowerCase();
+            Team team = scoreboard.getTeam(teamName);
+            if (team == null) {
+                team = scoreboard.registerNewTeam(teamName);
+            }
+            team.setColor(teamColor.getChatColor());
+            team.setPrefix(teamColor.getChatColor().toString());
+            team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+        }
+
+        // Murderer用のチーム（発光用）
+        Team murdererTeam = scoreboard.getTeam("murderer");
+        if (murdererTeam == null) {
+            murdererTeam = scoreboard.registerNewTeam("murderer");
+        }
+        murdererTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+
+        // 全プレイヤーを適切なチームに追加
+        for (Player target : Bukkit.getOnlinePlayers()) {
+            java.util.Optional<com.candyrush.models.PlayerData> dataOpt =
+                plugin.getPlayerManager().getPlayerData(target.getUniqueId());
+
+            if (dataOpt.isPresent()) {
+                com.candyrush.models.PlayerData data = dataOpt.get();
+                com.candyrush.models.TeamColor teamColor = data.getTeamColor();
+
+                if (teamColor != null) {
+                    String teamName = teamColor.name().toLowerCase();
+                    Team team = scoreboard.getTeam(teamName);
+                    if (team != null && !team.hasEntry(target.getName())) {
+                        team.addEntry(target.getName());
+                    }
+                }
+            }
+        }
     }
 
     /**

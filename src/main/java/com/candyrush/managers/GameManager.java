@@ -574,42 +574,31 @@ public class GameManager {
      * チーム拠点にコンクリートを配置してプレイヤーをテレポート
      */
     private void setupTeamBasesAndTeleport(org.bukkit.World world, org.bukkit.Location center, int mapRadius) {
-        // 各チームの拠点を設置してプレイヤーをテレポート
+        // 全プレイヤーを中央のランダムな位置にテレポート
         long delay = 5L; // 0.25秒後から開始
-        int totalTeams = 0;
 
-        for (TeamColor teamColor : TeamColor.values()) {
-            Team team = plugin.getTeamManager().getTeam(teamColor);
-            if (team == null || team.getPlayerCount() == 0) {
-                continue;
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers()) {
+                // 中央から半径50ブロック以内のランダムな位置を生成
+                int randomRadius = 50;
+                double angle = Math.random() * 2 * Math.PI;
+                double distance = Math.random() * randomRadius;
+
+                int x = (int) (center.getBlockX() + distance * Math.cos(angle));
+                int z = (int) (center.getBlockZ() + distance * Math.sin(angle));
+
+                // 安全な地上の位置を見つける（窒息防止）
+                int y = world.getHighestBlockYAt(x, z) + 1;
+
+                org.bukkit.Location spawnLocation = new org.bukkit.Location(world, x + 0.5, y, z + 0.5);
+                spawnLocation.setYaw((float) (Math.random() * 360));
+
+                player.teleport(spawnLocation);
+                plugin.getLogger().info("Teleported " + player.getName() + " to random center location (X=" + x + ", Y=" + y + ", Z=" + z + ")");
             }
-
-            totalTeams++;
-
-            // チーム拠点の座標を取得
-            org.bukkit.Location baseLocation = plugin.getTeamManager().getTeamSpawnLocation(world, center, mapRadius, teamColor);
-
-            // コンクリート配置とテレポートを同時に実行（遅延処理）
-            final long currentDelay = delay;
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                // コンクリートを配置
-                placeTeamConcrete(baseLocation, teamColor);
-
-                // このチームの全プレイヤーをテレポート
-                for (UUID playerUuid : team.getPlayerUuids()) {
-                    org.bukkit.entity.Player player = Bukkit.getPlayer(playerUuid);
-                    if (player != null && player.isOnline()) {
-                        player.teleport(baseLocation);
-                        plugin.getLogger().info("Teleported " + player.getName() + " to " + teamColor + " base");
-                    }
-                }
-            }, currentDelay);
-
-            delay += 3L; // 次のチームは0.15秒後
-        }
+        }, delay);
 
         // 全プレイヤーのテレポート完了後にワールドボーダーを設定
-        // 最後のチームのテレポート + 10tick（0.5秒）後
         long borderDelay = delay + 10L;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             setupMapBarrier(world, center, mapRadius);
@@ -775,31 +764,14 @@ public class GameManager {
      * すべてのプレイヤーのネームタグを常に表示に設定
      */
     private void setupNameTagVisibility() {
+        // ScoreboardManagerがすでにチーム色設定を各プレイヤーのScoreboardに適用しているため
+        // ここでは全プレイヤーのScoreboardを更新するだけ
         for (Player player : Bukkit.getOnlinePlayers()) {
-            // ネームタグを常に表示
-            org.bukkit.scoreboard.Scoreboard scoreboard = player.getScoreboard();
-            if (scoreboard == null || scoreboard == Bukkit.getScoreboardManager().getMainScoreboard()) {
-                scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-                player.setScoreboard(scoreboard);
-            }
-
-            // すべてのプレイヤーのチームを設定（ネームタグ表示用）
-            org.bukkit.scoreboard.Team nameTagTeam = scoreboard.getTeam("nametags");
-            if (nameTagTeam == null) {
-                nameTagTeam = scoreboard.registerNewTeam("nametags");
-            }
-            nameTagTeam.setOption(org.bukkit.scoreboard.Team.Option.NAME_TAG_VISIBILITY,
-                                  org.bukkit.scoreboard.Team.OptionStatus.ALWAYS);
-
-            // すべてのプレイヤーをチームに追加
-            for (Player target : Bukkit.getOnlinePlayers()) {
-                if (!nameTagTeam.hasEntry(target.getName())) {
-                    nameTagTeam.addEntry(target.getName());
-                }
-            }
+            plugin.getScoreboardManager().setupScoreboard(player);
+            plugin.getPlayerManager().updatePlayerTeamColor(player);
         }
 
-        plugin.getLogger().info("Name tags set to ALWAYS visible for all players");
+        plugin.getLogger().info("Setup team colors and name tag visibility for all players");
     }
 
     /**
