@@ -5,14 +5,18 @@ import com.candyrush.models.PlayerData;
 import com.candyrush.models.TeamColor;
 import com.candyrush.utils.MessageUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +33,58 @@ public class PvpListener implements Listener {
     public PvpListener(CandyRushPlugin plugin) {
         this.plugin = plugin;
         this.lastVictims = new HashMap<>();
+    }
+
+    /**
+     * プレイヤーへの攻撃を検知してMurderer化
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    public void onPlayerDamage(EntityDamageByEntityEvent event) {
+        // ゲームが進行中でない場合は無視
+        if (!plugin.getGameManager().isGameRunning()) {
+            return;
+        }
+
+        // 被害者がプレイヤーかチェック
+        if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+
+        // 攻撃者がプレイヤーかチェック
+        if (!(event.getDamager() instanceof Player)) {
+            return;
+        }
+
+        Player victim = (Player) event.getEntity();
+        Player attacker = (Player) event.getDamager();
+
+        // 自分への攻撃は無視
+        if (attacker.equals(victim)) {
+            return;
+        }
+
+        // チーム確認 - 同じチーム同士の攻撃は無効
+        PlayerData attackerData = plugin.getPlayerManager().getOrCreatePlayerData(attacker);
+        PlayerData victimData = plugin.getPlayerManager().getOrCreatePlayerData(victim);
+
+        TeamColor attackerTeam = attackerData.getTeamColor();
+        TeamColor victimTeam = victimData.getTeamColor();
+
+        if (attackerTeam != null && victimTeam != null && attackerTeam == victimTeam) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // 被害者がMurdererかチェック
+        boolean victimIsMurderer = plugin.getPlayerManager().isMurderer(victim.getUniqueId());
+
+        if (victimIsMurderer) {
+            // Murdererへの攻撃 - ペナルティなし
+            return;
+        }
+
+        // 一般プレイヤーへの攻撃 - Murderer化
+        applyMurdererPenalty(attacker, victim, attackerData);
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -67,8 +123,8 @@ public class PvpListener implements Listener {
             return;
         }
 
-        // PvP処理
-        handlePvpKill(killer, victim);
+        // PvP死亡処理（キル/デスのカウントのみ）
+        handlePvpDeath(killer, victim);
     }
 
     /**
@@ -88,9 +144,9 @@ public class PvpListener implements Listener {
     }
 
     /**
-     * PvPキル処理
+     * PvP死亡処理（キル/デスのカウント）
      */
-    private void handlePvpKill(Player killer, Player victim) {
+    private void handlePvpDeath(Player killer, Player victim) {
         PlayerData killerData = plugin.getPlayerManager().getOrCreatePlayerData(killer);
         PlayerData victimData = plugin.getPlayerManager().getOrCreatePlayerData(victim);
 
@@ -101,7 +157,7 @@ public class PvpListener implements Listener {
         boolean victimIsMurderer = plugin.getPlayerManager().isMurderer(victim.getUniqueId());
 
         if (victimIsMurderer) {
-            // Murdererを倒した場合 - ペナルティなし、通常のキルとして処理
+            // Murdererを倒した場合 - 通常のキルとして処理
             killerData.incrementKills();
             victimData.incrementDeaths();
 
@@ -119,19 +175,15 @@ public class PvpListener implements Listener {
             Bukkit.broadcastMessage(MessageUtils.colorize(
                 plugin.getConfigManager().getPrefix() +
                 "&e" + killer.getName() + " &fが Murderer &c" + victim.getName() + " &fを倒しました！"));
-            plugin.getLogger().info(killer.getName() + " killed Murderer " + victim.getName() + " (no penalty)");
-            return;
-        }
+            plugin.getLogger().info(killer.getName() + " killed Murderer " + victim.getName());
+        } else {
+            // 一般プレイヤーを倒した場合 - 被害者のデス数のみ増加（キラーのキル数は増やさない）
+            victimData.incrementDeaths();
+            plugin.getPlayerManager().savePlayerData(victimData);
 
-        // マーダーでない人を攻撃した場合 - PK行為としてMurderer化
-        applyMurdererPenalty(killer, victim, killerData);
-
-        // 被害者のデス数のみ増加（キラーのキル数は増やさない）
-        victimData.incrementDeaths();
-        plugin.getPlayerManager().savePlayerData(victimData);
-
-        if (victimTeam != null) {
-            plugin.getTeamManager().incrementTeamDeaths(victimTeam);
+            if (victimTeam != null) {
+                plugin.getTeamManager().incrementTeamDeaths(victimTeam);
+            }
         }
     }
 
@@ -158,9 +210,8 @@ public class PvpListener implements Listener {
         if (isFirstTime) {
             // 初回のみ実行
 
-            // 名前を赤色に変更
-            killer.setDisplayName("§c" + killer.getName());
-            killer.setPlayerListName("§c" + killer.getName());
+            // 名前を赤色に変更（ディスプレイネーム、タブリスト、頭上の名前）
+            setPlayerNameRed(killer);
 
             // 防具を剥奪
             removeArmor(killer);
@@ -311,5 +362,56 @@ public class PvpListener implements Listener {
                name.endsWith("_CHESTPLATE") ||
                name.endsWith("_LEGGINGS") ||
                name.endsWith("_BOOTS");
+    }
+
+    /**
+     * プレイヤーの名前を赤色に設定（ディスプレイネーム、タブリスト、頭上の名前）
+     */
+    private void setPlayerNameRed(Player player) {
+        // ディスプレイネームとタブリストの名前
+        player.setDisplayName("§c" + player.getName());
+        player.setPlayerListName("§c" + player.getName());
+
+        // 頭上の名前（NameTag）を赤くするためにScoreboardのTeamを使用
+        Scoreboard scoreboard = player.getScoreboard();
+        if (scoreboard == null || scoreboard == Bukkit.getScoreboardManager().getMainScoreboard()) {
+            scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+            player.setScoreboard(scoreboard);
+        }
+
+        // Murdererチームを取得または作成
+        Team murdererTeam = scoreboard.getTeam("murderer");
+        if (murdererTeam == null) {
+            murdererTeam = scoreboard.registerNewTeam("murderer");
+            murdererTeam.setColor(ChatColor.RED);
+            murdererTeam.setPrefix("§c");
+        }
+
+        // プレイヤーをMurdererチームに追加
+        if (!murdererTeam.hasEntry(player.getName())) {
+            murdererTeam.addEntry(player.getName());
+        }
+
+        plugin.getLogger().info("Set player " + player.getName() + " name color to RED (including nametag)");
+    }
+
+    /**
+     * プレイヤーの名前を白色に戻す
+     */
+    private void setPlayerNameWhite(Player player) {
+        // ディスプレイネームとタブリストの名前
+        player.setDisplayName("§f" + player.getName());
+        player.setPlayerListName("§f" + player.getName());
+
+        // Scoreboardのチームから削除
+        Scoreboard scoreboard = player.getScoreboard();
+        if (scoreboard != null) {
+            Team murdererTeam = scoreboard.getTeam("murderer");
+            if (murdererTeam != null && murdererTeam.hasEntry(player.getName())) {
+                murdererTeam.removeEntry(player.getName());
+            }
+        }
+
+        plugin.getLogger().info("Set player " + player.getName() + " name color to WHITE");
     }
 }
