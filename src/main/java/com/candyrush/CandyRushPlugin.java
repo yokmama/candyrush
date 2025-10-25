@@ -1,6 +1,5 @@
 package com.candyrush;
 
-import com.candyrush.commands.ConvertCommand;
 import com.candyrush.commands.DebugCommand;
 import com.candyrush.commands.StatsCommand;
 import com.candyrush.integration.MythicMobsIntegration;
@@ -123,7 +122,6 @@ public class CandyRushPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerConnectionListener(this), this);
         getServer().getPluginManager().registerEvents(new TreasureChestListener(this), this);
         getServer().getPluginManager().registerEvents(new FoodConsumeListener(this), this);
-        getServer().getPluginManager().registerEvents(new GoldItemConvertListener(this), this);
         getServer().getPluginManager().registerEvents(new EventNpcListener(this), this);
         getServer().getPluginManager().registerEvents(new BossDeathListener(this), this);
         getServer().getPluginManager().registerEvents(new PvpListener(this), this);
@@ -134,8 +132,6 @@ public class CandyRushPlugin extends JavaPlugin {
         // Register commands
         getCommand("stats").setExecutor(new StatsCommand(this));
         getCommand("stats").setTabCompleter(new com.candyrush.commands.StatsCommandTabCompleter());
-
-        getCommand("convert").setExecutor(new ConvertCommand(this));
 
         getCommand("candyrush").setExecutor(new DebugCommand(this));
         getCommand("candyrush").setTabCompleter(new com.candyrush.commands.DebugCommandTabCompleter());

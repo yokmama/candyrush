@@ -37,13 +37,6 @@ stats:
   help_top: "&e/stats top &7- Show top 10 players"
   help_teams: "&e/stats teams &7- Show team rankings"
 
-# Convert Command
-convert:
-  success: "&a&l✓ Conversion Complete!"
-  converted: "&eConverted &6{items} items &eto &6{points}pt!"
-  total_points: "&eTotal Points: &6{points}pt"
-  nothing_to_convert: "&cNo food items to convert in your inventory!"
-
 # Shop Command
 shop:
   opened: "&aShop opened!"

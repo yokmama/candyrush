@@ -14,10 +14,6 @@ commands:
     description: Show game statistics and rankings
     usage: /stats [top|teams|help]
     permission: candyrush.stats
-  convert:
-    description: Convert all food in inventory to points
-    usage: /convert
-    permission: candyrush.convert
   shop:
     description: Open the item shop
     usage: /shop
@@ -31,9 +27,6 @@ commands:
 permissions:
   candyrush.stats:
     description: Allows use of /stats command
-    default: true
-  candyrush.convert:
-    description: Allows use of /convert command
     default: true
   candyrush.shop:
     description: Allows use of /shop command

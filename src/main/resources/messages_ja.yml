@@ -37,13 +37,6 @@ stats:
   help_top: "&e/stats top &7- トップ10プレイヤーを表示"
   help_teams: "&e/stats teams &7- チームランキングを表示"
 
-# 変換コマンド
-convert:
-  success: "&a&l✓ 変換完了！"
-  converted: "&e&6{items}個 &eのアイテムを &6{points}pt &eに変換しました！"
-  total_points: "&e合計ポイント: &6{points}pt"
-  nothing_to_convert: "&cインベントリに変換できる食べ物がありません！"
-
 # ショップコマンド
 shop:
   opened: "&aショップを開きました！"
