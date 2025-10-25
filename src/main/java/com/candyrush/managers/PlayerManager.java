@@ -99,6 +99,9 @@ public class PlayerManager {
         data.updateLastSeen();
         savePlayerData(data);
 
+        // 初期状態でnormalチームに追加（これで他のプレイヤーの色が見える）
+        updatePlayerTeamColor(player);
+
         plugin.getLogger().fine("Player joined: " + player.getName() + " (" + player.getUniqueId() + ")");
     }
 

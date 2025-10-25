@@ -262,10 +262,25 @@ public class GameManager {
         for (Player player : Bukkit.getOnlinePlayers()) {
             MessageUtils.sendTitle(player, lang.getMessage("game.game_start"), "&e");
 
-            // プレイヤーの状態をリセット
+            // プレイヤーの状態を完全リセット
             player.setHealth(player.getMaxHealth()); // 体力を最大に
             player.setFoodLevel(20); // 空腹度を最大に
             player.setSaturation(20.0f); // 満腹度も最大に
+
+            // インベントリを完全クリア
+            player.getInventory().clear();
+
+            // 装備を完全クリア
+            player.getInventory().setHelmet(null);
+            player.getInventory().setChestplate(null);
+            player.getInventory().setLeggings(null);
+            player.getInventory().setBoots(null);
+
+            // ポイントをリセット
+            plugin.getPlayerManager().getPlayerData(player.getUniqueId()).ifPresent(data -> {
+                data.setPoints(0);
+                plugin.getPlayerManager().savePlayerData(data);
+            });
 
             // Murdererステータスをクリア（これでnormalチームに戻る）
             plugin.getPlayerManager().clearMurderer(player.getUniqueId());
