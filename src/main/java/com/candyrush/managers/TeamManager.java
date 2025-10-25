@@ -3,6 +3,7 @@ package com.candyrush.managers;
 import com.candyrush.CandyRushPlugin;
 import com.candyrush.models.Team;
 import com.candyrush.models.TeamColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -74,6 +75,18 @@ public class TeamManager {
             team.addPlayer(playerUuid);
             plugin.getLogger().fine("Player " + playerUuid + " assigned to " + teamColor + " team");
         }
+
+        // PlayerDataのteamColorも更新
+        plugin.getPlayerManager().getPlayerData(playerUuid).ifPresent(data -> {
+            data.setTeamColor(teamColor);
+            plugin.getPlayerManager().savePlayerData(data);
+        });
+
+        // オンラインプレイヤーの場合、Scoreboardチーム色も更新
+        Player player = Bukkit.getPlayer(playerUuid);
+        if (player != null && player.isOnline()) {
+            plugin.getPlayerManager().updatePlayerTeamColor(player);
+        }
     }
 
     /**
@@ -83,6 +96,12 @@ public class TeamManager {
         for (Team team : teams.values()) {
             team.removePlayer(playerUuid);
         }
+
+        // PlayerDataのteamColorもクリア
+        plugin.getPlayerManager().getPlayerData(playerUuid).ifPresent(data -> {
+            data.setTeamColor(null);
+            plugin.getPlayerManager().savePlayerData(data);
+        });
     }
 
     /**
