@@ -39,8 +39,8 @@ event:
   monster-waves: 3                  # モンスターの波の回数
   monsters-per-wave: 5              # 1波あたりのモンスター数
   wave-interval-seconds: 30         # 波の間隔（秒）
-  reward-points-min: 50             # 報酬ポイント最小
-  reward-points-max: 100            # 報酬ポイント最大
+  reward-points-min: 1000           # 報酬ポイント最小
+  reward-points-max: 1000           # 報酬ポイント最大
   boss-spawn-threshold: 3           # ボス出現に必要な防衛イベントクリア回数
 
 # Murderer設定
