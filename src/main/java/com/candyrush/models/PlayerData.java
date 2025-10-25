@@ -83,17 +83,6 @@ public class PlayerData {
         return pkk;
     }
 
-    // 後方互換性のため（削除予定）
-    @Deprecated
-    public int getKills() {
-        return pkk;  // PKKとして扱う
-    }
-
-    @Deprecated
-    public int getDeaths() {
-        return 0;  // 使用しない
-    }
-
     public boolean isMurderer() {
         return isMurderer;
     }
@@ -153,31 +142,6 @@ public class PlayerData {
 
     public void incrementPkk() {
         this.pkk++;
-        this.updatedAt = System.currentTimeMillis() / 1000;
-    }
-
-    // 後方互換性のため（削除予定）
-    @Deprecated
-    public void setKills(int kills) {
-        this.pkk = kills;
-        this.updatedAt = System.currentTimeMillis() / 1000;
-    }
-
-    @Deprecated
-    public void incrementKills() {
-        this.pkk++;
-        this.updatedAt = System.currentTimeMillis() / 1000;
-    }
-
-    @Deprecated
-    public void setDeaths(int deaths) {
-        // 使用しない
-        this.updatedAt = System.currentTimeMillis() / 1000;
-    }
-
-    @Deprecated
-    public void incrementDeaths() {
-        // 使用しない
         this.updatedAt = System.currentTimeMillis() / 1000;
     }
 

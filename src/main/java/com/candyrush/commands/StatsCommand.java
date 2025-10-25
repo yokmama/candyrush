@@ -84,9 +84,9 @@ public class StatsCommand implements CommandExecutor {
         }
 
         viewer.sendMessage(MessageUtils.colorize("&eポイント: &6" + MessageUtils.formatPoints(data.getPoints())));
-        viewer.sendMessage(MessageUtils.colorize("&eキル: &c" + data.getKills()));
-        viewer.sendMessage(MessageUtils.colorize("&eデス: &7" + data.getDeaths()));
-        viewer.sendMessage(MessageUtils.colorize("&eK/D: &b" + String.format("%.2f", data.getKDRatio())));
+        viewer.sendMessage(MessageUtils.colorize("&ePK: &c" + data.getPk()));
+        viewer.sendMessage(MessageUtils.colorize("&ePKK: &6" + data.getPkk()));
+        viewer.sendMessage(MessageUtils.colorize("&ePKK/PK: &b" + String.format("%.2f", data.getKDRatio())));
 
         if (data.isMurdererActive()) {
             viewer.sendMessage(MessageUtils.colorize("&c&l状態: Murderer"));

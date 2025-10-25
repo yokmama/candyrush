@@ -134,21 +134,21 @@ public class PlayerManager {
     }
 
     /**
-     * プレイヤーのキルをカウント
+     * プレイヤーのPKをカウント
      */
-    public void incrementKills(UUID uuid) {
+    public void incrementPk(UUID uuid) {
         getPlayerData(uuid).ifPresent(data -> {
-            data.incrementKills();
+            data.incrementPk();
             savePlayerData(data);
         });
     }
 
     /**
-     * プレイヤーのデスをカウント
+     * プレイヤーのPKKをカウント
      */
-    public void incrementDeaths(UUID uuid) {
+    public void incrementPkk(UUID uuid) {
         getPlayerData(uuid).ifPresent(data -> {
-            data.incrementDeaths();
+            data.incrementPkk();
             savePlayerData(data);
         });
     }
