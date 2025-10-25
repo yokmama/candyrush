@@ -99,9 +99,6 @@ public class PlayerManager {
         data.updateLastSeen();
         savePlayerData(data);
 
-        // Murderer状態の場合は名前の色を更新
-        updatePlayerNameColor(player);
-
         plugin.getLogger().fine("Player joined: " + player.getName() + " (" + player.getUniqueId() + ")");
     }
 
@@ -202,65 +199,7 @@ public class PlayerManager {
         getPlayerData(uuid).ifPresent(data -> {
             data.clearMurderer();
             savePlayerData(data);
-
-            // 名前の色を白に戻す
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                setPlayerNameWhite(player);
-            }
         });
-    }
-
-    /**
-     * プレイヤーの名前タグの色を更新（Murderer状態に応じて）
-     */
-    public void updatePlayerNameColor(Player player) {
-        if (isMurderer(player.getUniqueId())) {
-            setPlayerNameRed(player);
-        } else {
-            setPlayerNameWhite(player);
-        }
-    }
-
-    /**
-     * プレイヤーの名前を赤色に設定（ディスプレイネーム、タブリスト、頭上の名前）
-     */
-    private void setPlayerNameRed(Player player) {
-        // ディスプレイネームとタブリストの名前
-        player.setDisplayName("§c" + player.getName());
-        player.setPlayerListName("§c" + player.getName());
-
-        // 頭上の名前（NameTag）を赤くするためにメインScoreboardのTeamを使用
-        org.bukkit.scoreboard.Scoreboard mainScoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-
-        // Murdererチームを取得または作成
-        org.bukkit.scoreboard.Team murdererTeam = mainScoreboard.getTeam("murderer");
-        if (murdererTeam == null) {
-            murdererTeam = mainScoreboard.registerNewTeam("murderer");
-            murdererTeam.setColor(org.bukkit.ChatColor.RED);
-            murdererTeam.setPrefix("§c");
-        }
-
-        // プレイヤーをMurdererチームに追加
-        if (!murdererTeam.hasEntry(player.getName())) {
-            murdererTeam.addEntry(player.getName());
-        }
-    }
-
-    /**
-     * プレイヤーの名前を白色に戻す
-     */
-    private void setPlayerNameWhite(Player player) {
-        // ディスプレイネームとタブリストの名前
-        player.setDisplayName("§f" + player.getName());
-        player.setPlayerListName("§f" + player.getName());
-
-        // メインScoreboardのチームから削除
-        org.bukkit.scoreboard.Scoreboard mainScoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-        org.bukkit.scoreboard.Team murdererTeam = mainScoreboard.getTeam("murderer");
-        if (murdererTeam != null && murdererTeam.hasEntry(player.getName())) {
-            murdererTeam.removeEntry(player.getName());
-        }
     }
 
     /**

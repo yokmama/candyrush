@@ -267,9 +267,6 @@ public class GameManager {
 
             // ネームタグを常に表示
             player.setCanPickupItems(true);
-
-            // 名前の色を更新（Murderer状態に応じて）
-            plugin.getPlayerManager().updatePlayerNameColor(player);
         }
 
         // すべてのプレイヤーのネームタグを常に表示に設定

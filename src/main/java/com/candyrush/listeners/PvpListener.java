@@ -210,9 +210,6 @@ public class PvpListener implements Listener {
         if (isFirstTime) {
             // 初回のみ実行
 
-            // 名前を赤色に変更（ディスプレイネーム、タブリスト、頭上の名前）
-            setPlayerNameRed(killer);
-
             // 防具を剥奪
             removeArmor(killer);
 
@@ -364,54 +361,4 @@ public class PvpListener implements Listener {
                name.endsWith("_BOOTS");
     }
 
-    /**
-     * プレイヤーの名前を赤色に設定（ディスプレイネーム、タブリスト、頭上の名前）
-     */
-    private void setPlayerNameRed(Player player) {
-        // ディスプレイネームとタブリストの名前
-        player.setDisplayName("§c" + player.getName());
-        player.setPlayerListName("§c" + player.getName());
-
-        // 頭上の名前（NameTag）を赤くするためにScoreboardのTeamを使用
-        Scoreboard scoreboard = player.getScoreboard();
-        if (scoreboard == null || scoreboard == Bukkit.getScoreboardManager().getMainScoreboard()) {
-            scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-            player.setScoreboard(scoreboard);
-        }
-
-        // Murdererチームを取得または作成
-        Team murdererTeam = scoreboard.getTeam("murderer");
-        if (murdererTeam == null) {
-            murdererTeam = scoreboard.registerNewTeam("murderer");
-            murdererTeam.setColor(ChatColor.RED);
-            murdererTeam.setPrefix("§c");
-        }
-
-        // プレイヤーをMurdererチームに追加
-        if (!murdererTeam.hasEntry(player.getName())) {
-            murdererTeam.addEntry(player.getName());
-        }
-
-        plugin.getLogger().info("Set player " + player.getName() + " name color to RED (including nametag)");
-    }
-
-    /**
-     * プレイヤーの名前を白色に戻す
-     */
-    private void setPlayerNameWhite(Player player) {
-        // ディスプレイネームとタブリストの名前
-        player.setDisplayName("§f" + player.getName());
-        player.setPlayerListName("§f" + player.getName());
-
-        // Scoreboardのチームから削除
-        Scoreboard scoreboard = player.getScoreboard();
-        if (scoreboard != null) {
-            Team murdererTeam = scoreboard.getTeam("murderer");
-            if (murdererTeam != null && murdererTeam.hasEntry(player.getName())) {
-                murdererTeam.removeEntry(player.getName());
-            }
-        }
-
-        plugin.getLogger().info("Set player " + player.getName() + " name color to WHITE");
-    }
 }

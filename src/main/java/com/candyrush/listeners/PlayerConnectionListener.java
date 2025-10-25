@@ -30,9 +30,6 @@ public class PlayerConnectionListener implements Listener {
         // スコアボードを設定
         plugin.getScoreboardManager().setupScoreboard(player);
 
-        // 名前の色を更新（Murderer状態に応じて）
-        plugin.getPlayerManager().updatePlayerNameColor(player);
-
         // ゲーム状態を表示
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             String state = plugin.getGameManager().getCurrentState().name();
