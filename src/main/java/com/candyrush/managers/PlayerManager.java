@@ -229,6 +229,15 @@ public class PlayerManager {
         PlayerData data = dataOpt.get();
         TeamColor teamColor = data.getTeamColor();
 
+        // タブリスト（プレイヤーリスト）の名前色を設定
+        if (teamColor != null) {
+            player.setPlayerListName(teamColor.getChatColor() + player.getName());
+            player.setDisplayName(teamColor.getChatColor() + player.getName());
+        } else {
+            player.setPlayerListName("§f" + player.getName());
+            player.setDisplayName("§f" + player.getName());
+        }
+
         // プレイヤーの全てのScoreboardチームから削除
         org.bukkit.scoreboard.Scoreboard scoreboard = player.getScoreboard();
         if (scoreboard != null) {
