@@ -262,8 +262,8 @@ public class TreasureChestManager {
                 }
             }
 
-            plugin.getLogger().info("Filled " + chestType + " at " + formatLocation(location) +
-                " with " + itemCount + " items: " + String.join(", ", itemsAdded));
+            // plugin.getLogger().info("Filled " + chestType + " at " + formatLocation(location) +
+            //     " with " + itemCount + " items: " + String.join(", ", itemsAdded));
 
             // 検証
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -335,10 +335,10 @@ public class TreasureChestManager {
         boolean updated = container.update(true, false);
 
         if (updated) {
-            plugin.getLogger().info("Filled " + chestType + " at " + formatLocation(location) +
-                " with " + itemCount + " items: " + items.stream()
-                    .map(item -> item.getType().name() + "x" + item.getAmount())
-                    .collect(java.util.stream.Collectors.joining(", ")));
+            // plugin.getLogger().info("Filled " + chestType + " at " + formatLocation(location) +
+            //     " with " + itemCount + " items: " + items.stream()
+            //         .map(item -> item.getType().name() + "x" + item.getAmount())
+            //         .collect(java.util.stream.Collectors.joining(", ")));
         } else {
             plugin.getLogger().warning("Failed to update container at " + formatLocation(location));
         }
