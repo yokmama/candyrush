@@ -131,12 +131,10 @@ public class PvpListener implements Listener {
      * PvP以外の死亡処理
      */
     private void handleNonPvpDeath(Player victim) {
+        // PvP以外の死亡ではPK/PKKをカウントしない
+        // チームデスのみカウント
         PlayerData victimData = plugin.getPlayerManager().getOrCreatePlayerData(victim);
         TeamColor victimTeam = victimData.getTeamColor();
-
-        // デスカウント
-        victimData.incrementDeaths();
-        plugin.getPlayerManager().savePlayerData(victimData);
 
         if (victimTeam != null) {
             plugin.getTeamManager().incrementTeamDeaths(victimTeam);
@@ -144,7 +142,7 @@ public class PvpListener implements Listener {
     }
 
     /**
-     * PvP死亡処理（キル/デスのカウント）
+     * PvP死亡処理（PK/PKKのカウント）
      */
     private void handlePvpDeath(Player killer, Player victim) {
         PlayerData killerData = plugin.getPlayerManager().getOrCreatePlayerData(killer);
@@ -157,12 +155,10 @@ public class PvpListener implements Listener {
         boolean victimIsMurderer = plugin.getPlayerManager().isMurderer(victim.getUniqueId());
 
         if (victimIsMurderer) {
-            // Murdererを倒した場合 - 通常のキルとして処理
-            killerData.incrementKills();
-            victimData.incrementDeaths();
+            // Murdererを倒した場合 - PKK（Player Killer Kill）をカウント
+            killerData.incrementPkk();
 
             plugin.getPlayerManager().savePlayerData(killerData);
-            plugin.getPlayerManager().savePlayerData(victimData);
 
             if (killerTeam != null) {
                 plugin.getTeamManager().incrementTeamKills(killerTeam);
@@ -175,11 +171,10 @@ public class PvpListener implements Listener {
             Bukkit.broadcastMessage(MessageUtils.colorize(
                 plugin.getConfigManager().getPrefix() +
                 "&e" + killer.getName() + " &fが Murderer &c" + victim.getName() + " &fを倒しました！"));
-            plugin.getLogger().info(killer.getName() + " killed Murderer " + victim.getName());
+            plugin.getLogger().info(killer.getName() + " killed Murderer " + victim.getName() + " (PKK+1)");
         } else {
-            // 一般プレイヤーを倒した場合 - 被害者のデス数のみ増加（キラーのキル数は増やさない）
-            victimData.incrementDeaths();
-            plugin.getPlayerManager().savePlayerData(victimData);
+            // 一般プレイヤーを倒した場合 - キラーは既にMurdererなので何もカウントしない
+            // （一般プレイヤーを攻撃した時点でMurdererになり、その時にPKがカウントされる）
 
             if (victimTeam != null) {
                 plugin.getTeamManager().incrementTeamDeaths(victimTeam);
@@ -200,6 +195,13 @@ public class PvpListener implements Listener {
         // 前回の被害者と比較
         UUID lastVictimUuid = lastVictims.get(killer.getUniqueId());
         boolean isDifferentVictim = lastVictimUuid == null || !lastVictimUuid.equals(victim.getUniqueId());
+
+        // PK（Player Kill）をカウント - 異なる被害者への攻撃時のみ
+        if (isDifferentVictim) {
+            killerData.incrementPk();
+            plugin.getPlayerManager().savePlayerData(killerData);
+            plugin.getLogger().info("Player " + killer.getName() + " PK count increased (total: " + killerData.getPk() + ")");
+        }
 
         // 今回の被害者を記録
         lastVictims.put(killer.getUniqueId(), victim.getUniqueId());

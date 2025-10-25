@@ -212,8 +212,8 @@ public class ScoreboardManager {
                 // プレイヤー統計
                 setScore(objective, MessageUtils.colorize("&e━━━ &6統計 &e━━━"), line--);
                 setScore(objective, MessageUtils.colorize("&7ポイント: &a" + playerData.getPoints()), line--);
-                setScore(objective, MessageUtils.colorize("&7キル: &c" + playerData.getKills()), line--);
-                setScore(objective, MessageUtils.colorize("&7デス: &7" + playerData.getDeaths()), line--);
+                setScore(objective, MessageUtils.colorize("&7PK: &c" + playerData.getPk()), line--);
+                setScore(objective, MessageUtils.colorize("&7PKK: &6" + playerData.getPkk()), line--);
 
                 // 殺人者状態
                 if (playerData.isMurderer()) {
@@ -230,8 +230,8 @@ public class ScoreboardManager {
                 // 最終スコア
                 setScore(objective, MessageUtils.colorize("&e━━━ &6最終スコア &e━━━"), line--);
                 setScore(objective, MessageUtils.colorize("&7ポイント: &a" + playerData.getPoints()), line--);
-                setScore(objective, MessageUtils.colorize("&7キル: &c" + playerData.getKills()), line--);
-                setScore(objective, MessageUtils.colorize("&7デス: &7" + playerData.getDeaths()), line--);
+                setScore(objective, MessageUtils.colorize("&7PK: &c" + playerData.getPk()), line--);
+                setScore(objective, MessageUtils.colorize("&7PKK: &6" + playerData.getPkk()), line--);
                 break;
         }
 

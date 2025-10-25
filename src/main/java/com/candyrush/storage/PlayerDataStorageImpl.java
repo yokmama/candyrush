@@ -41,6 +41,8 @@ public class PlayerDataStorageImpl implements PlayerDataStorage {
 
     @Override
     public void savePlayer(PlayerData playerData) throws SQLException {
+        // Note: DBカラム名は kills/deaths だが、実際の意味は pk/pkk
+        // kills = PK (Player Kill), deaths = PKK (Player Killer Kill)
         String sql = "INSERT INTO players (uuid, name, team_color, points, kills, deaths, " +
                     "is_murderer, murderer_until, last_seen, created_at, updated_at) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
@@ -62,8 +64,8 @@ public class PlayerDataStorageImpl implements PlayerDataStorage {
             stmt.setString(2, playerData.getName());
             stmt.setString(3, playerData.getTeamColor() != null ? playerData.getTeamColor().name() : null);
             stmt.setInt(4, playerData.getPoints());
-            stmt.setInt(5, playerData.getKills());
-            stmt.setInt(6, playerData.getDeaths());
+            stmt.setInt(5, playerData.getPk());     // kills -> PK
+            stmt.setInt(6, playerData.getPkk());    // deaths -> PKK
             stmt.setInt(7, playerData.isMurderer() ? 1 : 0);
             stmt.setLong(8, playerData.getMurdererUntil());
             stmt.setLong(9, playerData.getLastSeen());
@@ -202,15 +204,16 @@ public class PlayerDataStorageImpl implements PlayerDataStorage {
         String teamColorStr = rs.getString("team_color");
         TeamColor teamColor = teamColorStr != null ? TeamColor.valueOf(teamColorStr) : null;
         int points = rs.getInt("points");
-        int kills = rs.getInt("kills");
-        int deaths = rs.getInt("deaths");
+        // Note: DBカラム名は kills/deaths だが、実際の意味は pk/pkk
+        int pk = rs.getInt("kills");      // kills -> PK
+        int pkk = rs.getInt("deaths");    // deaths -> PKK
         boolean isMurderer = rs.getInt("is_murderer") == 1;
         long murdererUntil = rs.getLong("murderer_until");
         long lastSeen = rs.getLong("last_seen");
         long createdAt = rs.getLong("created_at");
         long updatedAt = rs.getLong("updated_at");
 
-        return new PlayerData(uuid, name, teamColor, points, kills, deaths,
+        return new PlayerData(uuid, name, teamColor, points, pk, pkk,
                             isMurderer, murdererUntil, lastSeen, createdAt, updatedAt);
     }
 }

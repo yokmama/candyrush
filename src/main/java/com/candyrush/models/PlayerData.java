@@ -11,8 +11,8 @@ public class PlayerData {
     private String name;
     private TeamColor teamColor;
     private int points;
-    private int kills;
-    private int deaths;
+    private int pk;      // Player Kill - 一般プレイヤーを殺した回数（累積）
+    private int pkk;     // Player Killer Kill - Murdererを倒した回数（累積）
     private boolean isMurderer;
     private long murdererUntil;  // Epoch timestamp
     private long lastSeen;  // Epoch timestamp
@@ -29,8 +29,8 @@ public class PlayerData {
         this.name = name;
         this.teamColor = null;  // Not assigned to a team yet
         this.points = 0;
-        this.kills = 0;
-        this.deaths = 0;
+        this.pk = 0;
+        this.pkk = 0;
         this.isMurderer = false;
         this.murdererUntil = 0;
         long now = System.currentTimeMillis() / 1000;
@@ -42,14 +42,14 @@ public class PlayerData {
     /**
      * Create a PlayerData instance from database values
      */
-    public PlayerData(UUID uuid, String name, TeamColor teamColor, int points, int kills, int deaths,
+    public PlayerData(UUID uuid, String name, TeamColor teamColor, int points, int pk, int pkk,
                       boolean isMurderer, long murdererUntil, long lastSeen, long createdAt, long updatedAt) {
         this.uuid = uuid;
         this.name = name;
         this.teamColor = teamColor;
         this.points = points;
-        this.kills = kills;
-        this.deaths = deaths;
+        this.pk = pk;
+        this.pkk = pkk;
         this.isMurderer = isMurderer;
         this.murdererUntil = murdererUntil;
         this.lastSeen = lastSeen;
@@ -75,12 +75,23 @@ public class PlayerData {
         return points;
     }
 
-    public int getKills() {
-        return kills;
+    public int getPk() {
+        return pk;
     }
 
+    public int getPkk() {
+        return pkk;
+    }
+
+    // 後方互換性のため（削除予定）
+    @Deprecated
+    public int getKills() {
+        return pkk;  // PKKとして扱う
+    }
+
+    @Deprecated
     public int getDeaths() {
-        return deaths;
+        return 0;  // 使用しない
     }
 
     public boolean isMurderer() {
@@ -125,23 +136,48 @@ public class PlayerData {
         this.updatedAt = System.currentTimeMillis() / 1000;
     }
 
+    public void setPk(int pk) {
+        this.pk = pk;
+        this.updatedAt = System.currentTimeMillis() / 1000;
+    }
+
+    public void incrementPk() {
+        this.pk++;
+        this.updatedAt = System.currentTimeMillis() / 1000;
+    }
+
+    public void setPkk(int pkk) {
+        this.pkk = pkk;
+        this.updatedAt = System.currentTimeMillis() / 1000;
+    }
+
+    public void incrementPkk() {
+        this.pkk++;
+        this.updatedAt = System.currentTimeMillis() / 1000;
+    }
+
+    // 後方互換性のため（削除予定）
+    @Deprecated
     public void setKills(int kills) {
-        this.kills = kills;
+        this.pkk = kills;
         this.updatedAt = System.currentTimeMillis() / 1000;
     }
 
+    @Deprecated
     public void incrementKills() {
-        this.kills++;
+        this.pkk++;
         this.updatedAt = System.currentTimeMillis() / 1000;
     }
 
+    @Deprecated
     public void setDeaths(int deaths) {
-        this.deaths = deaths;
+        // 使用しない
         this.updatedAt = System.currentTimeMillis() / 1000;
     }
 
+    @Deprecated
     public void incrementDeaths() {
-        this.deaths++;
+        // 使用しない
         this.updatedAt = System.currentTimeMillis() / 1000;
     }
 
@@ -199,14 +235,14 @@ public class PlayerData {
     }
 
     /**
-     * Get K/D ratio
-     * @return Kill/Death ratio (0 if no deaths)
+     * Get PKK/PK ratio
+     * @return PKK/PK ratio (PKK if no PK)
      */
     public double getKDRatio() {
-        if (deaths == 0) {
-            return kills;
+        if (pk == 0) {
+            return pkk;
         }
-        return (double) kills / deaths;
+        return (double) pkk / pk;
     }
 
     @Override
@@ -216,8 +252,8 @@ public class PlayerData {
                 ", name='" + name + '\'' +
                 ", teamColor=" + teamColor +
                 ", points=" + points +
-                ", kills=" + kills +
-                ", deaths=" + deaths +
+                ", pk=" + pk +
+                ", pkk=" + pkk +
                 ", isMurderer=" + isMurderer +
                 '}';
     }
