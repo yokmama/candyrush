@@ -3,6 +3,7 @@ package com.candyrush.listeners;
 import com.candyrush.CandyRushPlugin;
 import com.candyrush.utils.MessageUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -29,6 +30,14 @@ public class PlayerConnectionListener implements Listener {
 
         // スコアボードを設定
         plugin.getScoreboardManager().setupScoreboard(player);
+
+        // 既存の全プレイヤーを新プレイヤーのScoreboardに追加
+        // これをしないと新プレイヤーから既存プレイヤーの色が見えない
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            for (Player existingPlayer : Bukkit.getOnlinePlayers()) {
+                plugin.getPlayerManager().updatePlayerTeamColor(existingPlayer);
+            }
+        }, 5L);
 
         // ゲーム状態を表示
         Bukkit.getScheduler().runTaskLater(plugin, () -> {

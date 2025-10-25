@@ -230,6 +230,8 @@ public class PlayerManager {
      * プレイヤーのScoreboardチーム色を更新
      * 注: Scoreboardチームはmurderer（赤）とnormal（白）の2つのみ
      * ゲームチーム（Red/Blue/Green/Yellow）はPlayerData.teamColorで管理
+     *
+     * 重要: 全プレイヤーのScoreboardを更新することで、全員から見える
      */
     public void updatePlayerTeamColor(Player player) {
         Optional<PlayerData> dataOpt = getPlayerData(player.getUniqueId());
@@ -240,9 +242,13 @@ public class PlayerManager {
         PlayerData data = dataOpt.get();
         boolean isMurderer = data.isMurdererActive();
 
-        // Scoreboardチームの設定（murderer or normal）
-        org.bukkit.scoreboard.Scoreboard scoreboard = player.getScoreboard();
-        if (scoreboard != null) {
+        // 全プレイヤーのScoreboardを更新（これで全員から見える）
+        for (Player viewer : Bukkit.getOnlinePlayers()) {
+            org.bukkit.scoreboard.Scoreboard scoreboard = viewer.getScoreboard();
+            if (scoreboard == null) {
+                continue;
+            }
+
             // 両方のチームから削除
             org.bukkit.scoreboard.Team murdererTeam = scoreboard.getTeam("murderer");
             org.bukkit.scoreboard.Team normalTeam = scoreboard.getTeam("normal");
