@@ -231,7 +231,7 @@ public class PlayerManager {
      * 注: Scoreboardチームはmurderer（赤）とnormal（白）の2つのみ
      * ゲームチーム（Red/Blue/Green/Yellow）はPlayerData.teamColorで管理
      *
-     * メインScoreboardを使っているので、チームに追加すれば自動的に全員から見える
+     * 重要: メインScoreboardと全プレイヤーの個別Scoreboardの両方を更新
      */
     public void updatePlayerTeamColor(Player player) {
         Optional<PlayerData> dataOpt = getPlayerData(player.getUniqueId());
@@ -242,24 +242,38 @@ public class PlayerManager {
         PlayerData data = dataOpt.get();
         boolean isMurderer = data.isMurdererActive();
 
-        // メインScoreboardのチームを取得
+        // 1. メインScoreboardを更新
         org.bukkit.scoreboard.Scoreboard mainScoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        updateTeamInScoreboard(mainScoreboard, player.getName(), isMurderer);
 
-        org.bukkit.scoreboard.Team murdererTeam = mainScoreboard.getTeam("murderer");
-        org.bukkit.scoreboard.Team normalTeam = mainScoreboard.getTeam("normal");
+        // 2. 全プレイヤーの個別Scoreboardを更新（これで全員から見える）
+        for (Player viewer : Bukkit.getOnlinePlayers()) {
+            org.bukkit.scoreboard.Scoreboard scoreboard = viewer.getScoreboard();
+            if (scoreboard != null && scoreboard != mainScoreboard) {
+                updateTeamInScoreboard(scoreboard, player.getName(), isMurderer);
+            }
+        }
+    }
+
+    /**
+     * 指定されたScoreboardのチームを更新
+     */
+    private void updateTeamInScoreboard(org.bukkit.scoreboard.Scoreboard scoreboard, String playerName, boolean isMurderer) {
+        org.bukkit.scoreboard.Team murdererTeam = scoreboard.getTeam("murderer");
+        org.bukkit.scoreboard.Team normalTeam = scoreboard.getTeam("normal");
 
         // 両方のチームから削除
-        if (murdererTeam != null && murdererTeam.hasEntry(player.getName())) {
-            murdererTeam.removeEntry(player.getName());
+        if (murdererTeam != null && murdererTeam.hasEntry(playerName)) {
+            murdererTeam.removeEntry(playerName);
         }
-        if (normalTeam != null && normalTeam.hasEntry(player.getName())) {
-            normalTeam.removeEntry(player.getName());
+        if (normalTeam != null && normalTeam.hasEntry(playerName)) {
+            normalTeam.removeEntry(playerName);
         }
 
         // 適切なチームに追加
         org.bukkit.scoreboard.Team targetTeam = isMurderer ? murdererTeam : normalTeam;
-        if (targetTeam != null && !targetTeam.hasEntry(player.getName())) {
-            targetTeam.addEntry(player.getName());
+        if (targetTeam != null && !targetTeam.hasEntry(playerName)) {
+            targetTeam.addEntry(playerName);
         }
     }
 

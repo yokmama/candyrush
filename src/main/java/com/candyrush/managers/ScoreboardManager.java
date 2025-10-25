@@ -71,27 +71,81 @@ public class ScoreboardManager {
 
     /**
      * プレイヤーにスコアボードを設定
+     *
+     * 重要: 個別Scoreboardを作成してサイドバー表示用に使う
+     * ただし、チーム（名前の色）はメインScoreboardで管理
      */
     public void setupScoreboard(Player player) {
+        org.bukkit.scoreboard.ScoreboardManager manager = Bukkit.getScoreboardManager();
+        if (manager == null) {
+            return;
+        }
+
+        // 個別Scoreboardを作成（サイドバー表示用）
+        Scoreboard playerScoreboard = manager.getNewScoreboard();
+
+        // サイドバー用のObjectiveを作成
+        Objective objective = playerScoreboard.registerNewObjective(
+            "candyrush",
+            "dummy",
+            MessageUtils.colorize("&e&l⚡ &6&lCandy Rush &e&l⚡")
+        );
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+        // メインScoreboardのチームをコピー（名前の色が見えるように）
+        copyTeamsFromMainScoreboard(playerScoreboard);
+
+        // 個別Scoreboardを設定
+        player.setScoreboard(playerScoreboard);
+
+        updatePlayerScoreboard(player);
+    }
+
+    /**
+     * メインScoreboardのチーム情報を個別Scoreboardにコピー
+     */
+    private void copyTeamsFromMainScoreboard(Scoreboard playerScoreboard) {
         if (mainScoreboard == null) {
             return;
         }
 
-        // メインScoreboardを設定
-        player.setScoreboard(mainScoreboard);
+        // murdererチームをコピー
+        Team mainMurdererTeam = mainScoreboard.getTeam("murderer");
+        if (mainMurdererTeam != null) {
+            Team murdererTeam = playerScoreboard.getTeam("murderer");
+            if (murdererTeam == null) {
+                murdererTeam = playerScoreboard.registerNewTeam("murderer");
+            }
+            murdererTeam.setColor(org.bukkit.ChatColor.RED);
+            murdererTeam.setPrefix("§c");
+            murdererTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
 
-        // サイドバー用のObjectiveを作成（まだなければ）
-        Objective objective = mainScoreboard.getObjective("candyrush");
-        if (objective == null) {
-            objective = mainScoreboard.registerNewObjective(
-                "candyrush",
-                "dummy",
-                MessageUtils.colorize("&e&l⚡ &6&lCandy Rush &e&l⚡")
-            );
-            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+            // メンバーをコピー
+            for (String entry : mainMurdererTeam.getEntries()) {
+                if (!murdererTeam.hasEntry(entry)) {
+                    murdererTeam.addEntry(entry);
+                }
+            }
         }
 
-        updatePlayerScoreboard(player);
+        // normalチームをコピー
+        Team mainNormalTeam = mainScoreboard.getTeam("normal");
+        if (mainNormalTeam != null) {
+            Team normalTeam = playerScoreboard.getTeam("normal");
+            if (normalTeam == null) {
+                normalTeam = playerScoreboard.registerNewTeam("normal");
+            }
+            normalTeam.setColor(org.bukkit.ChatColor.WHITE);
+            normalTeam.setPrefix("§f");
+            normalTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+
+            // メンバーをコピー
+            for (String entry : mainNormalTeam.getEntries()) {
+                if (!normalTeam.hasEntry(entry)) {
+                    normalTeam.addEntry(entry);
+                }
+            }
+        }
     }
 
     /**
