@@ -230,17 +230,13 @@ public class PlayerManager {
         player.setDisplayName("§c" + player.getName());
         player.setPlayerListName("§c" + player.getName());
 
-        // 頭上の名前（NameTag）を赤くするためにScoreboardのTeamを使用
-        org.bukkit.scoreboard.Scoreboard scoreboard = player.getScoreboard();
-        if (scoreboard == null || scoreboard == Bukkit.getScoreboardManager().getMainScoreboard()) {
-            scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-            player.setScoreboard(scoreboard);
-        }
+        // 頭上の名前（NameTag）を赤くするためにメインScoreboardのTeamを使用
+        org.bukkit.scoreboard.Scoreboard mainScoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 
         // Murdererチームを取得または作成
-        org.bukkit.scoreboard.Team murdererTeam = scoreboard.getTeam("murderer");
+        org.bukkit.scoreboard.Team murdererTeam = mainScoreboard.getTeam("murderer");
         if (murdererTeam == null) {
-            murdererTeam = scoreboard.registerNewTeam("murderer");
+            murdererTeam = mainScoreboard.registerNewTeam("murderer");
             murdererTeam.setColor(org.bukkit.ChatColor.RED);
             murdererTeam.setPrefix("§c");
         }
@@ -259,13 +255,11 @@ public class PlayerManager {
         player.setDisplayName("§f" + player.getName());
         player.setPlayerListName("§f" + player.getName());
 
-        // Scoreboardのチームから削除
-        org.bukkit.scoreboard.Scoreboard scoreboard = player.getScoreboard();
-        if (scoreboard != null) {
-            org.bukkit.scoreboard.Team murdererTeam = scoreboard.getTeam("murderer");
-            if (murdererTeam != null && murdererTeam.hasEntry(player.getName())) {
-                murdererTeam.removeEntry(player.getName());
-            }
+        // メインScoreboardのチームから削除
+        org.bukkit.scoreboard.Scoreboard mainScoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        org.bukkit.scoreboard.Team murdererTeam = mainScoreboard.getTeam("murderer");
+        if (murdererTeam != null && murdererTeam.hasEntry(player.getName())) {
+            murdererTeam.removeEntry(player.getName());
         }
     }
 
