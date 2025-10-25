@@ -262,6 +262,15 @@ public class GameManager {
         for (Player player : Bukkit.getOnlinePlayers()) {
             MessageUtils.sendTitle(player, lang.getMessage("game.game_start"), "&e");
 
+            // プレイヤーの状態をリセット
+            player.setHealth(player.getMaxHealth()); // 体力を最大に
+            player.setFoodLevel(20); // 空腹度を最大に
+            player.setSaturation(20.0f); // 満腹度も最大に
+            player.setGlowing(false); // 発光をリセット
+
+            // Murdererステータスをクリア
+            plugin.getPlayerManager().clearMurderer(player.getUniqueId());
+
             // ショップアイテムを付与（スロット9番目）
             plugin.getShopManager().giveShopItem(player);
 

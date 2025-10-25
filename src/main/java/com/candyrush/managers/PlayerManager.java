@@ -200,10 +200,11 @@ public class PlayerManager {
             data.clearMurderer();
             savePlayerData(data);
 
-            // 発光エフェクトを削除
+            // 発光エフェクトを削除してnormalチームに戻す
             Player player = Bukkit.getPlayer(uuid);
             if (player != null && player.isOnline()) {
                 player.setGlowing(false);
+                updatePlayerTeamColor(player);
             }
         });
     }
