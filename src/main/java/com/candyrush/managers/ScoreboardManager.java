@@ -62,27 +62,26 @@ public class ScoreboardManager {
     }
 
     /**
-     * Scoreboardにチーム色を設定
+     * Scoreboardに名前色用のチームを設定（murdererチームとnormalチーム）
      */
     private void setupTeamColors(Scoreboard scoreboard) {
-        // 各TeamColorに対応するScoreboardチームを作成
-        for (com.candyrush.models.TeamColor teamColor : com.candyrush.models.TeamColor.values()) {
-            String teamName = teamColor.name().toLowerCase();
-            Team team = scoreboard.getTeam(teamName);
-            if (team == null) {
-                team = scoreboard.registerNewTeam(teamName);
-            }
-            team.setColor(teamColor.getChatColor());
-            team.setPrefix(teamColor.getChatColor().toString());
-            team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
-        }
-
-        // Murderer用のチーム（発光用）
+        // Murdererチーム（赤色）
         Team murdererTeam = scoreboard.getTeam("murderer");
         if (murdererTeam == null) {
             murdererTeam = scoreboard.registerNewTeam("murderer");
         }
+        murdererTeam.setColor(org.bukkit.ChatColor.RED);
+        murdererTeam.setPrefix("§c");
         murdererTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+
+        // 通常プレイヤーチーム（白色）
+        Team normalTeam = scoreboard.getTeam("normal");
+        if (normalTeam == null) {
+            normalTeam = scoreboard.registerNewTeam("normal");
+        }
+        normalTeam.setColor(org.bukkit.ChatColor.WHITE);
+        normalTeam.setPrefix("§f");
+        normalTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
 
         // 全プレイヤーを適切なチームに追加
         for (Player target : Bukkit.getOnlinePlayers()) {
@@ -91,14 +90,11 @@ public class ScoreboardManager {
 
             if (dataOpt.isPresent()) {
                 com.candyrush.models.PlayerData data = dataOpt.get();
-                com.candyrush.models.TeamColor teamColor = data.getTeamColor();
+                boolean isMurderer = data.isMurdererActive();
 
-                if (teamColor != null) {
-                    String teamName = teamColor.name().toLowerCase();
-                    Team team = scoreboard.getTeam(teamName);
-                    if (team != null && !team.hasEntry(target.getName())) {
-                        team.addEntry(target.getName());
-                    }
+                Team targetTeam = isMurderer ? murdererTeam : normalTeam;
+                if (!targetTeam.hasEntry(target.getName())) {
+                    targetTeam.addEntry(target.getName());
                 }
             }
         }

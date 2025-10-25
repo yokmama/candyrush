@@ -225,26 +225,26 @@ public class PvpListener implements Listener {
                 "&c&l" + killer.getName() + " &fが &e" + victim.getName() + " &fを攻撃しました！"));
             Bukkit.broadcastMessage(MessageUtils.colorize(
                 plugin.getConfigManager().getPrefix() +
-                "&c&l" + killer.getName() + " がPK行為を行い、Murdererになりました！"));
+                "&c&l" + killer.getName() + " &fがMurdererになりました！"));
             Bukkit.broadcastMessage(MessageUtils.colorize(
                 "&e防具が剥奪され、最大60分間装備できません"));
 
             // キラーへのメッセージ
             MessageUtils.sendTitle(killer,
                 "&4&lMURDERER",
-                "&cPK行為ごとに+3分 (最大60分)");
+                "&c攻撃ごとに+3分 (最大60分)");
 
-            plugin.getLogger().warning("Player " + killer.getName() + " became a murderer for the first time (PK on " + victim.getName() + ")");
+            plugin.getLogger().warning("Player " + killer.getName() + " became a murderer (attacked " + victim.getName() + ")");
         } else if (shouldAnnounce) {
             // 2回目以降でも、異なるプレイヤーへの攻撃時はアナウンス
             Bukkit.broadcastMessage(MessageUtils.colorize(
                 plugin.getConfigManager().getPrefix() +
                 "&c&l" + killer.getName() + " &fが &e" + victim.getName() + " &fを攻撃しました！"));
 
-            plugin.getLogger().info("Player " + killer.getName() + " PK'd " + victim.getName() + " (different victim, murderer time extended by 3 minutes)");
+            plugin.getLogger().info("Player " + killer.getName() + " attacked " + victim.getName() + " (different victim, murderer time extended by 3 minutes)");
         } else {
             // 同じプレイヤーへの攻撃 - アナウンスなし、時間のみ延長
-            plugin.getLogger().info("Player " + killer.getName() + " PK'd " + victim.getName() + " again (murderer time extended by 3 minutes)");
+            plugin.getLogger().info("Player " + killer.getName() + " attacked " + victim.getName() + " again (murderer time extended by 3 minutes)");
         }
     }
 

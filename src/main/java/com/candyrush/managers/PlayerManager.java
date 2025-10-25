@@ -219,6 +219,8 @@ public class PlayerManager {
 
     /**
      * プレイヤーのScoreboardチーム色を更新
+     * 注: Scoreboardチームはmurderer（赤）とnormal（白）の2つのみ
+     * ゲームチーム（Red/Blue/Green/Yellow）はPlayerData.teamColorで管理
      */
     public void updatePlayerTeamColor(Player player) {
         Optional<PlayerData> dataOpt = getPlayerData(player.getUniqueId());
@@ -227,35 +229,26 @@ public class PlayerManager {
         }
 
         PlayerData data = dataOpt.get();
-        TeamColor teamColor = data.getTeamColor();
+        boolean isMurderer = data.isMurdererActive();
 
-        // タブリスト（プレイヤーリスト）の名前色を設定
-        if (teamColor != null) {
-            player.setPlayerListName(teamColor.getChatColor() + player.getName());
-            player.setDisplayName(teamColor.getChatColor() + player.getName());
-        } else {
-            player.setPlayerListName("§f" + player.getName());
-            player.setDisplayName("§f" + player.getName());
-        }
-
-        // プレイヤーの全てのScoreboardチームから削除
+        // Scoreboardチームの設定（murderer or normal）
         org.bukkit.scoreboard.Scoreboard scoreboard = player.getScoreboard();
         if (scoreboard != null) {
-            for (TeamColor tc : TeamColor.values()) {
-                String teamName = tc.name().toLowerCase();
-                org.bukkit.scoreboard.Team team = scoreboard.getTeam(teamName);
-                if (team != null && team.hasEntry(player.getName())) {
-                    team.removeEntry(player.getName());
-                }
+            // 両方のチームから削除
+            org.bukkit.scoreboard.Team murdererTeam = scoreboard.getTeam("murderer");
+            org.bukkit.scoreboard.Team normalTeam = scoreboard.getTeam("normal");
+
+            if (murdererTeam != null && murdererTeam.hasEntry(player.getName())) {
+                murdererTeam.removeEntry(player.getName());
+            }
+            if (normalTeam != null && normalTeam.hasEntry(player.getName())) {
+                normalTeam.removeEntry(player.getName());
             }
 
-            // 新しいチームに追加
-            if (teamColor != null) {
-                String teamName = teamColor.name().toLowerCase();
-                org.bukkit.scoreboard.Team team = scoreboard.getTeam(teamName);
-                if (team != null && !team.hasEntry(player.getName())) {
-                    team.addEntry(player.getName());
-                }
+            // 適切なチームに追加
+            org.bukkit.scoreboard.Team targetTeam = isMurderer ? murdererTeam : normalTeam;
+            if (targetTeam != null && !targetTeam.hasEntry(player.getName())) {
+                targetTeam.addEntry(player.getName());
             }
         }
     }
