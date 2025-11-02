@@ -1,0 +1,22 @@
+# Event NPC Tier 4 - Hard Difficulty
+# Visual: Villager with red particles and glowing effect
+EventNPC_Tier4:
+  Type: VILLAGER
+  Display: '&c[Lv.4] Event NPC'
+  Health: 20
+  Damage: 0
+  Options:
+    MovementSpeed: 0
+    Silent: true
+    Despawn: false
+    PreventOtherDrops: true
+    PreventItemPickup: true
+    PreventRenaming: true
+    Glowing: true
+  DamageModifiers:
+    - ALL 0
+  Skills:
+    - particles{particle=FLAME;amount=3;speed=0.03;hSpread=0.5;vSpread=0.5;yOffset=1} @self ~12
+    - particles{particle=LAVA;amount=2;speed=0.02;hSpread=0.3;vSpread=0.3;yOffset=0.5} @self ~20
+    - particles{particle=FIREWORK;amount=3;speed=0.03;hSpread=0.4;vSpread=0.4;yOffset=1.5} @self ~18
+    - particles{particle=SMOKE;amount=1;speed=0.01;hSpread=0.2;vSpread=0.2;yOffset=0.1} @self ~25

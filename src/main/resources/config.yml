@@ -42,10 +42,92 @@ event:
   monster-waves: 3                  # モンスターの波の回数
   monsters-per-wave: 5              # 1波あたりのモンスター数
   wave-interval-seconds: 30         # 波の間隔（秒）
-  reward-points-min: 1000           # 報酬ポイント最小
-  reward-points-max: 1000           # 報酬ポイント最大
-  boss-spawn-threshold: 3           # ボス出現に必要な防衛イベントクリア回数
+  reward-points-min: 1000           # 報酬ポイント最小 (deprecated - use tiers)
+  reward-points-max: 1000           # 報酬ポイント最大 (deprecated - use tiers)
+  boss-spawn-threshold: 3           # ボス出現に必要な防衛イベントクリア回数 (deprecated - use boss-spawn-point-threshold)
+  boss-spawn-point-threshold: 100   # ボス出現に必要なポイント
   npc-respawn-delay-seconds: 120    # NPCリスポーンまでの時間（秒、2分）
+
+  # Tiered NPC Event System - 5 difficulty tiers with different rewards and monsters
+  tiers:
+    1:
+      npc-mob-type: "EventNPC_Tier1"
+      monsters:
+        - "CandyZombie"
+        - "CandySkeleton"
+      reward-points-min: 500
+      reward-points-max: 700
+      boss-spawn-points: 5
+      display-name-format: "&a[Lv.1] {name}"
+      monster-waves: 2              # 波の数（ソロでも可能）
+      monsters-per-wave: 3          # 1波あたり3体
+      defense-duration-seconds: 90  # 1分30秒
+      wave-interval-seconds: 25     # 波の間隔
+      spawn-weight: 40              # 出現確率の重み（40%）
+
+    2:
+      npc-mob-type: "EventNPC_Tier2"
+      monsters:
+        - "CandySkeleton"
+        - "CandySpider"
+        - "GummyBear"
+      reward-points-min: 1000
+      reward-points-max: 1200
+      boss-spawn-points: 10
+      display-name-format: "&e[Lv.2] {name}"
+      monster-waves: 2               # 波の数（2人推奨）
+      monsters-per-wave: 4           # 1波あたり4体
+      defense-duration-seconds: 110  # 1分50秒
+      wave-interval-seconds: 30      # 波の間隔
+      spawn-weight: 30               # 出現確率の重み（30%）
+
+    3:
+      npc-mob-type: "EventNPC_Tier3"
+      monsters:
+        - "CandySpider"
+        - "CandyCreeper"
+        - "ChocolateSoldier"
+      reward-points-min: 2000
+      reward-points-max: 2400
+      boss-spawn-points: 20
+      display-name-format: "&6[Lv.3] {name}"
+      monster-waves: 3               # 波の数（3人推奨）
+      monsters-per-wave: 4           # 1波あたり4体
+      defense-duration-seconds: 140  # 2分20秒
+      wave-interval-seconds: 30      # 波の間隔
+      spawn-weight: 20               # 出現確率の重み（20%）
+
+    4:
+      npc-mob-type: "EventNPC_Tier4"
+      monsters:
+        - "ChocolateSoldier"
+        - "LollipopArcher"
+        - "MintRunner"
+      reward-points-min: 4000
+      reward-points-max: 4800
+      boss-spawn-points: 35
+      display-name-format: "&c[Lv.4] {name}"
+      monster-waves: 3               # 波の数（4人推奨）
+      monsters-per-wave: 5           # 1波あたり5体
+      defense-duration-seconds: 170  # 2分50秒
+      wave-interval-seconds: 35      # 波の間隔
+      spawn-weight: 8                # 出現確率の重み（8%）
+
+    5:
+      npc-mob-type: "EventNPC_Tier5"
+      monsters:
+        - "EliteCandyZombie"
+        - "EliteCandySkeleton"
+        - "EliteGummyTitan"
+      reward-points-min: 8000
+      reward-points-max: 9600
+      boss-spawn-points: 50
+      display-name-format: "&4&l[Lv.5] {name}"
+      monster-waves: 3               # 波の数（5人必須）
+      monsters-per-wave: 6           # 1波あたり6体
+      defense-duration-seconds: 200  # 3分20秒
+      wave-interval-seconds: 40      # 波の間隔
+      spawn-weight: 2                # 出現確率の重み（2%、超レア）
 
 # Murderer設定
 murderer:

@@ -1,0 +1,19 @@
+# Event NPC Tier 2 - Easy Difficulty
+# Visual: Villager with yellow particles
+EventNPC_Tier2:
+  Type: VILLAGER
+  Display: '&e[Lv.2] Event NPC'
+  Health: 20
+  Damage: 0
+  Options:
+    MovementSpeed: 0
+    Silent: true
+    Despawn: false
+    PreventOtherDrops: true
+    PreventItemPickup: true
+    PreventRenaming: true
+  DamageModifiers:
+    - ALL 0
+  Skills:
+    - particles{particle=FLAME;amount=1;speed=0.01;hSpread=0.3;vSpread=0.3;yOffset=1} @self ~20
+    - particles{particle=FIREWORK;amount=1;speed=0.01;hSpread=0.2;vSpread=0.2;yOffset=1.5} @self ~40

@@ -15,6 +15,7 @@ public class PlayerData {
     private int pkk;     // Player Killer Kill - Murdererを倒した回数（累積）
     private int chestsOpened;  // 開けた宝箱の数（ラウンド毎）
     private int eventsCompleted;  // 完了したNPCイベントの数（ラウンド毎）
+    private int bossSpawnPoints;  // ボススポーンポイント（100で1回ボス召喚可能）
     private boolean isMurderer;
     private long murdererUntil;  // Epoch timestamp
     private long lastSeen;  // Epoch timestamp
@@ -35,6 +36,7 @@ public class PlayerData {
         this.pkk = 0;
         this.chestsOpened = 0;
         this.eventsCompleted = 0;
+        this.bossSpawnPoints = 0;
         this.isMurderer = false;
         this.murdererUntil = 0;
         long now = System.currentTimeMillis() / 1000;
@@ -47,7 +49,7 @@ public class PlayerData {
      * Create a PlayerData instance from database values
      */
     public PlayerData(UUID uuid, String name, TeamColor teamColor, int points, int pk, int pkk,
-                      int chestsOpened, int eventsCompleted, boolean isMurderer, long murdererUntil,
+                      int chestsOpened, int eventsCompleted, int bossSpawnPoints, boolean isMurderer, long murdererUntil,
                       long lastSeen, long createdAt, long updatedAt) {
         this.uuid = uuid;
         this.name = name;
@@ -57,6 +59,7 @@ public class PlayerData {
         this.pkk = pkk;
         this.chestsOpened = chestsOpened;
         this.eventsCompleted = eventsCompleted;
+        this.bossSpawnPoints = bossSpawnPoints;
         this.isMurderer = isMurderer;
         this.murdererUntil = murdererUntil;
         this.lastSeen = lastSeen;
@@ -96,6 +99,10 @@ public class PlayerData {
 
     public int getEventsCompleted() {
         return eventsCompleted;
+    }
+
+    public int getBossSpawnPoints() {
+        return bossSpawnPoints;
     }
 
     public boolean isMurderer() {
@@ -180,6 +187,26 @@ public class PlayerData {
         this.updatedAt = System.currentTimeMillis() / 1000;
     }
 
+    public void setBossSpawnPoints(int bossSpawnPoints) {
+        this.bossSpawnPoints = bossSpawnPoints;
+        this.updatedAt = System.currentTimeMillis() / 1000;
+    }
+
+    public int addBossSpawnPoints(int amount) {
+        this.bossSpawnPoints += amount;
+        this.updatedAt = System.currentTimeMillis() / 1000;
+        return this.bossSpawnPoints;
+    }
+
+    public void resetBossSpawnPoints() {
+        this.bossSpawnPoints = 0;
+        this.updatedAt = System.currentTimeMillis() / 1000;
+    }
+
+    public boolean canSpawnBoss() {
+        return bossSpawnPoints >= 100;
+    }
+
     public void setMurderer(boolean isMurderer) {
         this.isMurderer = isMurderer;
         this.updatedAt = System.currentTimeMillis() / 1000;
@@ -232,6 +259,7 @@ public class PlayerData {
         this.points = 0;
         this.chestsOpened = 0;
         this.eventsCompleted = 0;
+        this.bossSpawnPoints = 0;
         this.updatedAt = System.currentTimeMillis() / 1000;
     }
 
