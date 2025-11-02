@@ -220,12 +220,6 @@ items:
     price: 15
     category: tool
 
-  - id: lava_bucket
-    name: "§f[ツール] §6溶岩入りバケツ"
-    material: LAVA_BUCKET
-    price: 25
-    category: tool
-
   - id: bed
     name: "§f[ツール] §cベッド"
     material: RED_BED

@@ -146,6 +146,11 @@ public class TreasureChestManager {
         Random random = new Random();
         int distanceRejects = 0;
         int groundRejects = 0;
+        int heightRejects = 0;
+
+        // 高さ制限を取得
+        int minHeight = plugin.getConfigManager().getTreasureSpawnMinHeight();
+        int maxHeight = plugin.getConfigManager().getTreasureSpawnMaxHeight();
 
         // 最大10回試行
         for (int attempt = 0; attempt < 10; attempt++) {
@@ -162,6 +167,13 @@ public class TreasureChestManager {
             // 適切な高さを探す（地表を探索）
             // チャンクは既にロード済みなのでgetHighestBlockYAtは安全
             int groundY = chunk.getWorld().getHighestBlockYAt(x, z);
+
+            // 高さ制限チェック
+            if (groundY < minHeight || groundY > maxHeight) {
+                heightRejects++;
+                continue;
+            }
+
             int chestY = groundY + 1;
 
             // 地表が安全かチェック
@@ -173,6 +185,11 @@ public class TreasureChestManager {
             } else {
                 groundRejects++;
             }
+        }
+
+        // デバッグログ（リジェクトが多い場合）
+        if (heightRejects > 0) {
+            plugin.getLogger().fine("Chest spawn rejected due to height: " + heightRejects + " times (range: Y=" + minHeight + "-" + maxHeight + ")");
         }
 
         return null;

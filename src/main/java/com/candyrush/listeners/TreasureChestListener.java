@@ -193,8 +193,15 @@ public class TreasureChestListener implements Listener {
             // ポイントを計算
             int points = calculateFoodPoints(clickedItem);
 
-            // ポイントを加算
+            // ポイントを加算（個人とチーム）
             plugin.getPlayerManager().addPoints(player.getUniqueId(), points);
+
+            // チームポイントも加算
+            plugin.getPlayerManager().getPlayerData(player.getUniqueId()).ifPresent(data -> {
+                if (data.getTeamColor() != null) {
+                    plugin.getTeamManager().addTeamPoints(data.getTeamColor(), points);
+                }
+            });
 
             // メッセージ表示
             MessageUtils.sendActionBar(player, "&e&l+" + points + "pt &7" + clickedItem.getType().name() + " x" + clickedItem.getAmount());

@@ -10,6 +10,7 @@ import com.candyrush.storage.GameStateStorage;
 import com.candyrush.storage.GameStateStorageImpl;
 import com.candyrush.storage.PlayerDataStorage;
 import com.candyrush.storage.PlayerDataStorageImpl;
+import com.candyrush.tasks.MurdererExpirationTask;
 import com.candyrush.utils.ConfigManager;
 import com.candyrush.utils.LanguageManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -117,6 +118,13 @@ public class CandyRushPlugin extends JavaPlugin {
         bossManager.initialize();
         scoreboardManager.initialize();
         getLogger().info("Game managers initialized");
+
+        // Start scheduled tasks
+        MurdererExpirationTask murdererExpirationTask = new MurdererExpirationTask(
+            this, playerManager, playerDataStorage
+        );
+        murdererExpirationTask.runTaskTimer(this, 400L, 400L); // Run every 20 seconds (400 ticks)
+        getLogger().info("Scheduled tasks started (MurdererExpirationTask every 20s)");
 
         // Register event listeners
         getServer().getPluginManager().registerEvents(new PlayerConnectionListener(this), this);

@@ -8,11 +8,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Scoreboard;
@@ -50,13 +53,25 @@ public class PvpListener implements Listener {
             return;
         }
 
-        // 攻撃者がプレイヤーかチェック
-        if (!(event.getDamager() instanceof Player)) {
-            return;
+        Player victim = (Player) event.getEntity();
+        Player attacker = null;
+
+        // 攻撃者を特定（直接攻撃または発射物）
+        if (event.getDamager() instanceof Player) {
+            // 直接攻撃
+            attacker = (Player) event.getDamager();
+        } else if (event.getDamager() instanceof Projectile) {
+            // 発射物（矢、トライデントなど）
+            Projectile projectile = (Projectile) event.getDamager();
+            if (projectile.getShooter() instanceof Player) {
+                attacker = (Player) projectile.getShooter();
+            }
         }
 
-        Player victim = (Player) event.getEntity();
-        Player attacker = (Player) event.getDamager();
+        // 攻撃者が特定できない場合は無視
+        if (attacker == null) {
+            return;
+        }
 
         // 自分への攻撃は無視
         if (attacker.equals(victim)) {
@@ -230,7 +245,7 @@ public class PvpListener implements Listener {
                 plugin.getConfigManager().getPrefix() +
                 "&c&l" + killer.getName() + " &fがMurdererになりました！"));
             Bukkit.broadcastMessage(MessageUtils.colorize(
-                "&e防具が剥奪され、最大60分間装備できません"));
+                "&e防具が剥奪され、殺人者の間は装備できません"));
 
             // キラーへのメッセージ
             MessageUtils.sendTitle(killer,
@@ -354,6 +369,66 @@ public class PvpListener implements Listener {
             event.setCancelled(true);
             MessageUtils.sendActionBar(player, "&c&lMurderer状態では防具を装備できません！");
         }
+    }
+
+    /**
+     * 溶岩バケツの設置を検知してMurderer化
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
+        // ゲームが進行中でない場合は無視
+        if (!plugin.getGameManager().isGameRunning()) {
+            return;
+        }
+
+        // 溶岩バケツかチェック
+        if (event.getBucket() != Material.LAVA_BUCKET) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+        PlayerData playerData = plugin.getPlayerManager().getOrCreatePlayerData(player);
+
+        // Murdererペナルティを適用（被害者なし）
+        applyMurdererPenalty(player, null, playerData);
+
+        plugin.getLogger().info("Player " + player.getName() + " placed lava - marked as murderer");
+    }
+
+    /**
+     * 危険ブロックの設置を検知してMurderer化
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        // ゲームが進行中でない場合は無視
+        if (!plugin.getGameManager().isGameRunning()) {
+            return;
+        }
+
+        Material material = event.getBlock().getType();
+
+        // 危険ブロックかチェック
+        if (!isDangerousBlock(material)) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+        PlayerData playerData = plugin.getPlayerManager().getOrCreatePlayerData(player);
+
+        // Murdererペナルティを適用（被害者なし）
+        applyMurdererPenalty(player, null, playerData);
+
+        plugin.getLogger().info("Player " + player.getName() + " placed dangerous block (" + material + ") - marked as murderer");
+    }
+
+    /**
+     * マテリアルが危険ブロックかチェック
+     */
+    private boolean isDangerousBlock(Material material) {
+        return material == Material.MAGMA_BLOCK ||
+               material == Material.LAVA ||
+               material == Material.FIRE ||
+               material == Material.SOUL_FIRE;
     }
 
     /**

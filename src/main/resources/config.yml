@@ -30,6 +30,8 @@ treasure:
   trapped-chest-damage: 18.0        # トラップチェストのダメージ（ハート9個、死ぬ寸前）
   trapped-chest-equipment-chance: 0.7  # 装備出現確率
   respawn-delay-seconds: 60         # 再出現までの時間（秒）
+  spawn-min-height: 60              # 宝箱スポーン最低高度（Y座標）
+  spawn-max-height: 200             # 宝箱スポーン最高高度（Y座標）
 
 # イベント設定
 event:
