@@ -417,9 +417,14 @@ public class ShopManager implements Listener {
             return;
         }
 
-        // 購入処理
+        // 購入処理（個人ポイント減算、チームポイントも減算）
         playerData.addPoints(-shopItem.getPrice());
         plugin.getPlayerManager().savePlayerData(playerData);
+
+        // チームポイントも減算
+        if (playerData.getTeamColor() != null) {
+            plugin.getTeamManager().addTeamPoints(playerData.getTeamColor(), -shopItem.getPrice());
+        }
 
         // アイテムを渡す
         player.getInventory().addItem(shopItem.createPurchasedItem());

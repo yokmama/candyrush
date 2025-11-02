@@ -97,6 +97,19 @@ public class PlayerManager {
         PlayerData data = getOrCreatePlayerData(player);
         data.setName(player.getName()); // 名前が変わっている可能性
         data.updateLastSeen();
+
+        // Check if murderer status has expired while offline
+        if (data.isMurderer() && data.getMurdererUntil() > 0) {
+            long currentTime = System.currentTimeMillis() / 1000; // Unix timestamp in seconds
+            if (currentTime > data.getMurdererUntil()) {
+                // Clear expired murderer status
+                data.clearMurderer();
+                player.sendMessage("§a殺人者ステータスが解除されました");
+                plugin.getLogger().info("Cleared expired murderer status for " + player.getName() +
+                    " on login (was set until " + data.getMurdererUntil() + ", now is " + currentTime + ")");
+            }
+        }
+
         savePlayerData(data);
 
         // 初期状態でnormalチームに追加（これで他のプレイヤーの色が見える）

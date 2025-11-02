@@ -91,6 +91,14 @@ public class ConfigManager {
         return config.getInt("treasure.respawn-delay-seconds", 60);
     }
 
+    public int getTreasureSpawnMinHeight() {
+        return config.getInt("treasure.spawn-min-height", 60);
+    }
+
+    public int getTreasureSpawnMaxHeight() {
+        return config.getInt("treasure.spawn-max-height", 200);
+    }
+
     // Event settings
     public int getEventNpcPerChunks() {
         return config.getInt("event.npc-per-chunks", 3);

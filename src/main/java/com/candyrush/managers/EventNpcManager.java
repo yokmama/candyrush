@@ -259,10 +259,15 @@ public class EventNpcManager {
 
             plugin.getPlayerManager().addPoints(playerUuid, reward);
 
-            // イベント完了をプレイヤーデータに記録
+            // イベント完了をプレイヤーデータに記録してチームポイント追加
             plugin.getPlayerManager().getPlayerData(playerUuid).ifPresent(data -> {
                 data.incrementEventsCompleted();
                 plugin.getPlayerManager().savePlayerData(data);
+
+                // チームポイントも加算
+                if (data.getTeamColor() != null) {
+                    plugin.getTeamManager().addTeamPoints(data.getTeamColor(), reward);
+                }
             });
 
             // クリア回数をカウント

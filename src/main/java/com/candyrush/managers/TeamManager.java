@@ -157,13 +157,20 @@ public class TeamManager {
     }
 
     /**
-     * チームにポイントを追加
+     * チームにポイントを追加してスコアボードを更新
      */
     public void addTeamPoints(TeamColor color, int points) {
         Team team = teams.get(color);
-        if (team != null) {
-            team.addPoints(points);
+        if (team == null) {
+            plugin.getLogger().warning("Cannot add points to team " + color + " - team not found");
+            return;
         }
+
+        team.addPoints(points);
+        plugin.getLogger().fine("Added " + points + " points to " + color + " team (new total: " + team.getPoints() + ")");
+
+        // スコアボードを更新
+        plugin.getScoreboardManager().updateTeamScoreboards(color);
     }
 
     /**

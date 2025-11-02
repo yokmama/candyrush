@@ -360,6 +360,28 @@ public class ScoreboardManager {
     }
 
     /**
+     * 特定チームのスコアボードを更新
+     */
+    public void updateTeamScoreboards(TeamColor teamColor) {
+        com.candyrush.models.Team team = plugin.getTeamManager().getTeam(teamColor);
+        if (team == null) {
+            plugin.getLogger().warning("Cannot update scoreboards for team " + teamColor + " - team not found");
+            return;
+        }
+
+        int updatedCount = 0;
+        for (UUID uuid : team.getPlayerUuids()) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null && player.isOnline()) {
+                updatePlayerScoreboard(player);
+                updatedCount++;
+            }
+        }
+
+        plugin.getLogger().fine("Updated scoreboards for " + updatedCount + " players in " + teamColor + " team");
+    }
+
+    /**
      * スコアボード更新タスクを開始
      */
     private void startUpdateTask() {
