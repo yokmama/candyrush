@@ -224,6 +224,11 @@ public class MythicMobsIntegration {
         // List of mob configuration files to copy
         String[] mobFiles = {
             "EventNPC.yml",
+            "EventNPC_Tier1.yml",
+            "EventNPC_Tier2.yml",
+            "EventNPC_Tier3.yml",
+            "EventNPC_Tier4.yml",
+            "EventNPC_Tier5.yml",
             "RaidBoss.yml",
             "TreasureChestBoss.yml",
             "CandyRushBoss.yml",

@@ -1,0 +1,18 @@
+# Event NPC Tier 1 - Beginner Difficulty
+# Visual: Basic villager with white particles
+EventNPC_Tier1:
+  Type: VILLAGER
+  Display: '&a[Lv.1] Event NPC'
+  Health: 20
+  Damage: 0
+  Options:
+    MovementSpeed: 0
+    Silent: true
+    Despawn: false
+    PreventOtherDrops: true
+    PreventItemPickup: true
+    PreventRenaming: true
+  DamageModifiers:
+    - ALL 0
+  Skills:
+    - particles{particle=FIREWORK;amount=1;speed=0.01;hSpread=0.3;vSpread=0.3;yOffset=1} @self ~20

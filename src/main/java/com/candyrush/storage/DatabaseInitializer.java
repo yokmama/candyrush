@@ -97,6 +97,13 @@ public class DatabaseInitializer {
             } catch (SQLException e) {
                 // Column already exists, ignore
             }
+            try {
+                stmt.executeUpdate("ALTER TABLE players ADD COLUMN boss_spawn_points INTEGER DEFAULT 0");
+                plugin.getLogger().info("Added boss_spawn_points column to players table");
+            } catch (SQLException e) {
+                // Column already exists, ignore
+                plugin.getLogger().fine("boss_spawn_points column already exists");
+            }
 
             // Game rounds table - tracks game sessions
             stmt.executeUpdate(

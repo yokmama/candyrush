@@ -1,7 +1,9 @@
 package com.candyrush.managers;
 
 import com.candyrush.CandyRushPlugin;
+import com.candyrush.models.NPCEventTier;
 import com.candyrush.utils.MessageUtils;
+import com.candyrush.utils.NpcNameGenerator;
 import io.lumine.mythic.core.mobs.ActiveMob;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
@@ -26,11 +28,13 @@ public class EventNpcManager {
     private final Map<UUID, DefenseEvent> activeDefenseEvents;
     private final Map<UUID, NpcData> activeNpcs;  // Entity UUID -> NPC Data
     private final Map<UUID, Long> playerHelpMessageCooldown;  // Player UUID -> Last message time
-    private final Map<UUID, Integer> playerDefenseClearCount;  // Player UUID -> Clear count
+    private final Map<UUID, Integer> playerDefenseClearCount;  // Player UUID -> Clear count (deprecated)
     private final Map<NpcRespawnData, Long> pendingNpcRespawn;  // NPC respawn location -> respawn time
     private BukkitTask proximityCheckTask;
     private BukkitTask npcRespawnTask;
     private Integer currentRoundId;
+    private NpcNameGenerator nameGenerator;
+    private final Random random;
 
     public EventNpcManager(CandyRushPlugin plugin) {
         this.plugin = plugin;
@@ -40,15 +44,60 @@ public class EventNpcManager {
         this.playerDefenseClearCount = new ConcurrentHashMap<>();
         this.pendingNpcRespawn = new ConcurrentHashMap<>();
         this.currentRoundId = null;
+        this.random = new Random();
     }
 
     /**
      * マネージャーを初期化
      */
     public void initialize() {
+        // Initialize NPC name generator
+        List<String> npcNames = plugin.getConfigManager().getNpcNames();
+        if (npcNames.isEmpty()) {
+            plugin.getLogger().warning("No NPC names loaded - using fallback");
+            npcNames = List.of("太郎", "次郎", "さくら");
+        }
+        this.nameGenerator = new NpcNameGenerator(npcNames);
+
         startProximityCheckTask();
         startNpcRespawnTask();
-        plugin.getLogger().info("EventNpcManager initialized");
+        plugin.getLogger().info("EventNpcManager initialized with " + npcNames.size() + " NPC names");
+    }
+
+    /**
+     * Randomly select a tier from 1-5 using weighted probability
+     * Higher tier weights = more common spawns
+     * @return Weighted random tier between 1-5
+     */
+    private NPCEventTier selectRandomTier() {
+        List<NPCEventTier> tiers = plugin.getConfigManager().getEventTiers();
+
+        if (tiers.isEmpty()) {
+            plugin.getLogger().severe("No tiers configured! Cannot spawn NPC events");
+            return null;
+        }
+
+        // Calculate total weight
+        int totalWeight = 0;
+        for (NPCEventTier tier : tiers) {
+            totalWeight += tier.getSpawnWeight();
+        }
+
+        // Select random value in range [0, totalWeight)
+        int randomValue = random.nextInt(totalWeight);
+
+        // Find the tier corresponding to this random value
+        int currentWeight = 0;
+        for (NPCEventTier tier : tiers) {
+            currentWeight += tier.getSpawnWeight();
+            if (randomValue < currentWeight) {
+                return tier;
+            }
+        }
+
+        // Fallback to tier 1 (should never happen)
+        plugin.getLogger().warning("Weighted selection failed, falling back to tier 1");
+        return plugin.getConfigManager().getEventTier(1);
     }
 
     /**
@@ -75,7 +124,6 @@ public class EventNpcManager {
         }
 
         int npcPerChunks = plugin.getConfigManager().getEventNpcPerChunks();
-        String npcType = plugin.getConfigManager().getEventNpcType();
 
         // マップ内にNPCを配置（非同期）
         int centerChunkX = center.getBlockX() >> 4;
@@ -94,13 +142,13 @@ public class EventNpcManager {
         plugin.getLogger().info("Starting async NPC spawn for " + spawnCoordinates.size() + " locations");
 
         // 非同期で座標を探索してスポーン
-        spawnNpcsAsync(world, center, radius, npcType, spawnCoordinates, 0);
+        spawnNpcsAsync(world, center, radius, spawnCoordinates, 0);
     }
 
     /**
      * NPCを非同期でスポーン（再帰的に処理）
      */
-    private void spawnNpcsAsync(World world, Location center, int radius, String npcType,
+    private void spawnNpcsAsync(World world, Location center, int radius,
                                 List<int[]> coordinates, int index) {
         if (index >= coordinates.size()) {
             plugin.getLogger().info("Spawned " + activeNpcs.size() + " event NPCs in the map");
@@ -115,12 +163,12 @@ public class EventNpcManager {
         findSafeNpcLocationAsync(world, baseX, baseZ, center, radius, location -> {
             if (location != null) {
                 // メインスレッドでスポーン
-                Bukkit.getScheduler().runTask(plugin, () -> spawnNpc(location, npcType));
+                Bukkit.getScheduler().runTask(plugin, () -> spawnNpc(location));
             }
 
             // 次の座標を処理（1tick後）
             Bukkit.getScheduler().runTaskLater(plugin, () ->
-                spawnNpcsAsync(world, center, radius, npcType, coordinates, index + 1), 1L);
+                spawnNpcsAsync(world, center, radius, coordinates, index + 1), 1L);
         });
     }
 
@@ -169,22 +217,64 @@ public class EventNpcManager {
     }
 
     /**
-     * NPCをスポーン
+     * NPCをスポーン (tier-based)
      */
-    private void spawnNpc(Location location, String npcType) {
-        plugin.getMythicMobsIntegration().spawnMob(npcType, location, 1).ifPresent(activeMob -> {
-            UUID entityUuid = activeMob.getEntity().getUniqueId();
+    private void spawnNpc(Location location) {
+        // Select random tier
+        NPCEventTier selectedTier = selectRandomTier();
+        if (selectedTier == null) {
+            plugin.getLogger().warning("Failed to select tier for NPC at " + formatLocation(location));
+            return;
+        }
 
-            NpcData npcData = new NpcData(entityUuid, location, npcType);
+        String npcType = selectedTier.getNpcMobType();
+
+        // Try to spawn the NPC
+        Optional<ActiveMob> spawnResult = plugin.getMythicMobsIntegration().spawnMob(npcType, location, 1);
+
+        // Use final variables for lambda
+        NPCEventTier finalTier;
+        String finalNpcType;
+
+        if (!spawnResult.isPresent()) {
+            // Fallback to tier 1 if mob type doesn't exist
+            plugin.getLogger().warning("Failed to spawn " + npcType + ", falling back to tier 1");
+            NPCEventTier tier1 = plugin.getConfigManager().getEventTier(1);
+            if (tier1 != null) {
+                finalTier = tier1;
+                finalNpcType = tier1.getNpcMobType();
+                spawnResult = plugin.getMythicMobsIntegration().spawnMob(finalNpcType, location, 1);
+            } else {
+                finalTier = selectedTier;
+                finalNpcType = npcType;
+            }
+        } else {
+            finalTier = selectedTier;
+            finalNpcType = npcType;
+        }
+
+        spawnResult.ifPresent(activeMob -> {
+            UUID entityUuid = activeMob.getEntity().getUniqueId();
+            Entity npcEntity = activeMob.getEntity().getBukkitEntity();
+
+            // Generate random name with tier formatting
+            String formattedName = nameGenerator.getFormattedName(finalTier);
+
+            // Set custom name and make it visible
+            npcEntity.setCustomName(MessageUtils.colorize(formattedName));
+            npcEntity.setCustomNameVisible(true);
+
+            // Store NPC data with tier and name
+            NpcData npcData = new NpcData(entityUuid, location, finalNpcType, finalTier, formattedName);
             activeNpcs.put(entityUuid, npcData);
 
             // データベースに保存（UUIDを含む）
             if (currentRoundId != null) {
-                saveNpcToDatabase(location, npcType, currentRoundId, entityUuid);
+                saveNpcToDatabase(location, finalNpcType, currentRoundId, entityUuid);
             }
 
-            plugin.getLogger().fine("Spawned event NPC at " + formatLocation(location) +
-                                  " UUID: " + entityUuid);
+            plugin.getLogger().fine("Spawned event NPC (Tier " + finalTier.getTier() + ") at " + formatLocation(location) +
+                                  " UUID: " + entityUuid + " Name: " + formattedName);
         });
     }
 
@@ -253,32 +343,39 @@ public class EventNpcManager {
 
         if (success) {
             // 成功 - 報酬を付与
-            int rewardMin = plugin.getConfigManager().getRewardPointsMin();
-            int rewardMax = plugin.getConfigManager().getRewardPointsMax();
-            int reward = rewardMin + new Random().nextInt(rewardMax - rewardMin + 1);
+            NPCEventTier tier = event.npcData.getTier();
+            int rewardMin = tier != null ? tier.getRewardPointsMin() : plugin.getConfigManager().getRewardPointsMin();
+            int rewardMax = tier != null ? tier.getRewardPointsMax() : plugin.getConfigManager().getRewardPointsMax();
+            int reward = rewardMin + new Random().nextInt(Math.max(1, rewardMax - rewardMin + 1));
+
+            int bossSpawnPoints = tier != null ? tier.getBossSpawnPoints() : 5;
 
             plugin.getPlayerManager().addPoints(playerUuid, reward);
 
             // イベント完了をプレイヤーデータに記録してチームポイント追加
             plugin.getPlayerManager().getPlayerData(playerUuid).ifPresent(data -> {
                 data.incrementEventsCompleted();
+
+                // Add boss spawn points based on tier
+                data.addBossSpawnPoints(bossSpawnPoints);
+                int currentBossPoints = data.getBossSpawnPoints();
+
                 plugin.getPlayerManager().savePlayerData(data);
 
                 // チームポイントも加算
                 if (data.getTeamColor() != null) {
                     plugin.getTeamManager().addTeamPoints(data.getTeamColor(), reward);
                 }
+
+                plugin.getLogger().info("Player " + player.getName() + " earned " + bossSpawnPoints + " boss spawn points (now: " + currentBossPoints + ")");
             });
 
-            // クリア回数をカウント
-            int clearCount = playerDefenseClearCount.getOrDefault(playerUuid, 0) + 1;
-            playerDefenseClearCount.put(playerUuid, clearCount);
-
             // NPCから感謝のメッセージ
+            String tierName = tier != null ? "Lv." + tier.getTier() : "";
             MessageUtils.sendMessage(player, "&a&l✓ 防衛成功！");
             MessageUtils.sendMessage(player, "&e&l[NPC] &aありがとうございます！これを受け取ってください！");
             MessageUtils.sendMessage(player, "&6&l+" + reward + "pt &7報酬を獲得しました！");
-            MessageUtils.sendMessage(player, "&7防衛イベントクリア: &e" + clearCount + "&7回");
+            MessageUtils.sendMessage(player, "&d&l+" + bossSpawnPoints + "pt &7ボス召喚ポイント獲得！ " + tierName);
 
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1.0f, 1.0f);
@@ -290,19 +387,38 @@ public class EventNpcManager {
                 npc.remove();
 
                 // NPCのリスポーンをスケジュール
-                if (event != null && event.npcData != null) {
-                    scheduleNpcRespawn(npcLocation, event.npcData.getNpcType());
+                scheduleNpcRespawn(npcLocation);
+            }
+
+            plugin.getLogger().info("Player " + player.getName() + " completed defense event (Tier " +
+                                  (tier != null ? tier.getTier() : "?") + ") - reward: " + reward);
+
+            // ボス出現判定 - Point-based system
+            plugin.getPlayerManager().getPlayerData(playerUuid).ifPresent(data -> {
+                if (data.canSpawnBoss()) {
+                    int threshold = plugin.getConfigManager().getBossSpawnPointThreshold();
+                    int currentPoints = data.getBossSpawnPoints();
+                    int overflow = currentPoints - threshold;
+
+                    // Spawn boss
+                    spawnBossForPlayer(player);
+
+                    // Reset points to overflow
+                    data.resetBossSpawnPoints();
+                    if (overflow > 0) {
+                        data.addBossSpawnPoints(overflow);
+                    }
+
+                    plugin.getPlayerManager().savePlayerData(data);
+
+                    MessageUtils.sendMessage(player, "&d&lボス召喚ポイントが100に到達！");
+                    if (overflow > 0) {
+                        MessageUtils.sendMessage(player, "&7残り " + overflow + "pt は引き継がれました");
+                    }
+
+                    plugin.getLogger().info("Boss spawned for " + player.getName() + " - overflow: " + overflow);
                 }
-            }
-
-            plugin.getLogger().info("Player " + player.getName() + " completed defense event - reward: " + reward + " - clear count: " + clearCount);
-
-            // ボス出現判定
-            int threshold = plugin.getConfigManager().getBossSpawnThreshold();
-            if (clearCount >= threshold) {
-                spawnBossForPlayer(player);
-                playerDefenseClearCount.put(playerUuid, 0); // カウントリセット
-            }
+            });
         } else {
             // 失敗
             MessageUtils.sendMessage(player, "&c&l✗ 防衛失敗...");
@@ -317,9 +433,7 @@ public class EventNpcManager {
                 npc.remove();
 
                 // NPCのリスポーンをスケジュール
-                if (event != null && event.npcData != null) {
-                    scheduleNpcRespawn(npcLocation, event.npcData.getNpcType());
-                }
+                scheduleNpcRespawn(npcLocation);
             }
 
             plugin.getLogger().info("Player " + player.getName() + " failed defense event");
@@ -351,9 +465,7 @@ public class EventNpcManager {
             npc.remove();
 
             // NPCのリスポーンをスケジュール
-            if (event != null && event.npcData != null) {
-                scheduleNpcRespawn(npcLocation, event.npcData.getNpcType());
-            }
+            scheduleNpcRespawn(npcLocation);
         }
 
         plugin.getLogger().info("Player " + (player != null ? player.getName() : playerUuid) + " abandoned defense event");
@@ -449,15 +561,14 @@ public class EventNpcManager {
             // NPCをリスポーン
             for (NpcRespawnData data : toRespawn) {
                 Location loc = data.getLocation();
-                String npcType = data.getNpcType();
 
                 // チャンクがロードされているかチェック
                 int chunkX = loc.getBlockX() >> 4;
                 int chunkZ = loc.getBlockZ() >> 4;
 
                 if (loc.getWorld().isChunkLoaded(chunkX, chunkZ)) {
-                    // NPCをスポーン
-                    spawnNpc(loc, npcType);
+                    // NPCをスポーン (tier will be randomly selected)
+                    spawnNpc(loc);
                     pendingNpcRespawn.remove(data);
 
                     plugin.getLogger().fine("Respawned NPC at " + formatLocation(loc));
@@ -469,12 +580,12 @@ public class EventNpcManager {
     /**
      * NPCをリスポーン待ちリストに追加
      */
-    private void scheduleNpcRespawn(Location location, String npcType) {
+    private void scheduleNpcRespawn(Location location) {
         // リスポーン遅延時間を取得（秒）
         int respawnDelay = plugin.getConfigManager().getNpcRespawnDelay();
         long respawnTime = System.currentTimeMillis() + (respawnDelay * 1000L);
 
-        NpcRespawnData data = new NpcRespawnData(location.clone(), npcType);
+        NpcRespawnData data = new NpcRespawnData(location.clone());
         pendingNpcRespawn.put(data, respawnTime);
 
         plugin.getLogger().fine("Scheduled NPC respawn at " + formatLocation(location) +
@@ -659,11 +770,20 @@ public class EventNpcManager {
         private final UUID entityUuid;
         private final Location spawnLocation;
         private final String npcType;
+        private final NPCEventTier tier;
+        private final String npcName;
 
-        public NpcData(UUID entityUuid, Location spawnLocation, String npcType) {
+        public NpcData(UUID entityUuid, Location spawnLocation, String npcType, NPCEventTier tier, String npcName) {
             this.entityUuid = entityUuid;
             this.spawnLocation = spawnLocation;
             this.npcType = npcType;
+            this.tier = tier;
+            this.npcName = npcName;
+        }
+
+        // Legacy constructor for backward compatibility
+        public NpcData(UUID entityUuid, Location spawnLocation, String npcType) {
+            this(entityUuid, spawnLocation, npcType, null, null);
         }
 
         public UUID getEntityUuid() {
@@ -677,6 +797,14 @@ public class EventNpcManager {
         public String getNpcType() {
             return npcType;
         }
+
+        public NPCEventTier getTier() {
+            return tier;
+        }
+
+        public String getNpcName() {
+            return npcName;
+        }
     }
 
     /**
@@ -684,19 +812,13 @@ public class EventNpcManager {
      */
     private static class NpcRespawnData {
         private final Location location;
-        private final String npcType;
 
-        public NpcRespawnData(Location location, String npcType) {
+        public NpcRespawnData(Location location) {
             this.location = location;
-            this.npcType = npcType;
         }
 
         public Location getLocation() {
             return location;
-        }
-
-        public String getNpcType() {
-            return npcType;
         }
 
         @Override
@@ -704,12 +826,12 @@ public class EventNpcManager {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             NpcRespawnData that = (NpcRespawnData) o;
-            return location.equals(that.location) && npcType.equals(that.npcType);
+            return location.equals(that.location);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(location, npcType);
+            return Objects.hash(location);
         }
     }
 
@@ -737,10 +859,14 @@ public class EventNpcManager {
             this.npcLocation = npcLocation;
             this.npcData = npcData;
             this.spawnedMonsters = new ArrayList<>();
-            this.totalWaves = plugin.getConfigManager().getMonsterWaves();
-            this.monstersPerWave = plugin.getConfigManager().getMonstersPerWave();
-            this.waveInterval = plugin.getConfigManager().getWaveIntervalSeconds();
-            this.totalDuration = plugin.getConfigManager().getDefenseDurationSeconds();
+
+            // Use tier-specific parameters if available, otherwise fallback to global config
+            NPCEventTier tier = npcData != null ? npcData.getTier() : null;
+            this.totalWaves = tier != null ? tier.getMonsterWaves() : plugin.getConfigManager().getMonsterWaves();
+            this.monstersPerWave = tier != null ? tier.getMonstersPerWave() : plugin.getConfigManager().getMonstersPerWave();
+            this.waveInterval = tier != null ? tier.getWaveIntervalSeconds() : plugin.getConfigManager().getWaveIntervalSeconds();
+            this.totalDuration = tier != null ? tier.getDefenseDurationSeconds() : plugin.getConfigManager().getDefenseDurationSeconds();
+
             this.currentWave = 0;
             this.elapsedSeconds = 0;
             this.distanceWarningShown = false;
@@ -857,8 +983,14 @@ public class EventNpcManager {
                 player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.5f, 1.5f);
             }
 
-            // 最終波はエリートモブも含める
-            List<String> mobTypes = plugin.getConfigManager().getDefenseMobs();
+            // Get monsters from tier configuration, fallback to config if tier not available
+            List<String> mobTypes;
+            if (npcData != null && npcData.getTier() != null) {
+                mobTypes = npcData.getTier().getMonsters();
+            } else {
+                mobTypes = plugin.getConfigManager().getDefenseMobs();
+            }
+
             List<String> eliteMobTypes = plugin.getConfigManager().getDefenseEliteMobs();
 
             if (mobTypes.isEmpty()) {

@@ -1,0 +1,20 @@
+# Event NPC Tier 3 - Medium Difficulty
+# Visual: Wandering trader with orange particles
+EventNPC_Tier3:
+  Type: WANDERING_TRADER
+  Display: '&6[Lv.3] Event NPC'
+  Health: 20
+  Damage: 0
+  Options:
+    MovementSpeed: 0
+    Silent: true
+    Despawn: false
+    PreventOtherDrops: true
+    PreventItemPickup: true
+    PreventRenaming: true
+  DamageModifiers:
+    - ALL 0
+  Skills:
+    - particles{particle=FLAME;amount=2;speed=0.02;hSpread=0.4;vSpread=0.4;yOffset=1} @self ~15
+    - particles{particle=LAVA;amount=1;speed=0.01;hSpread=0.2;vSpread=0.2;yOffset=0.5} @self ~30
+    - particles{particle=FIREWORK;amount=2;speed=0.02;hSpread=0.3;vSpread=0.3;yOffset=1.5} @self ~25

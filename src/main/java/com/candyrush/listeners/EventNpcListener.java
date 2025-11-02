@@ -43,10 +43,9 @@ public class EventNpcListener implements Listener {
             return;
         }
 
-        // イベントNPCかチェック
-        String npcType = plugin.getConfigManager().getEventNpcType();
+        // イベントNPCかチェック (EventNPC or EventNPC_Tier1-5)
         plugin.getMythicMobsIntegration().getMobType(entity).ifPresent(mobType -> {
-            if (mobType.equals(npcType)) {
+            if (mobType.equals("EventNPC") || mobType.startsWith("EventNPC_Tier")) {
                 // 防衛イベント開始
                 plugin.getEventNpcManager().onPlayerClickNpc(player, entity);
                 event.setCancelled(true);
