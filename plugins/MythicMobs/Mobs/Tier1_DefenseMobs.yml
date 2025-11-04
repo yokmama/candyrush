@@ -1,0 +1,43 @@
+# Tier 1 Defense Monsters - Beginner Difficulty
+# HP reduction: 45%, Damage reduction: 40%, Armor reduction: 30% (if ≥5)
+# For new players with iron sword and starting equipment
+
+CandyZombie_Tier1:
+  Type: ZOMBIE
+  Display: '&a[Lv.1] &6Candy Zombie'
+  Health: 17        # Reduced from 30 (45% reduction)
+  Damage: 2         # Reduced from 4 (40% reduction)
+  Armor: 1          # Reduced from 2 (30% reduction)
+  Options:
+    MovementSpeed: 0.25
+    PreventItemPickup: true
+    PreventOtherDrops: true
+    PreventSunburn: true
+    Silent: false
+  Equipment:
+    - WOODEN_SWORD:0 HAND
+  Drops:
+    - SUGAR 1-2 0.8
+    - COOKIE 1 0.3
+  Skills:
+    - particles{particle=SOUL;amount=1;speed=0.01;hSpread=0.2;vSpread=0.2;yOffset=1} @self ~20
+
+CandySkeleton_Tier1:
+  Type: SKELETON
+  Display: '&a[Lv.1] &eLollipop Archer'
+  Health: 14        # Reduced from 25 (45% reduction)
+  Damage: 2         # Reduced from 3 (40% reduction)
+  Armor: 1          # Reduced from 2 (30% reduction)
+  Options:
+    MovementSpeed: 0.25
+    PreventItemPickup: true
+    PreventOtherDrops: true
+    PreventSunburn: true
+  Equipment:
+    - BOW:0 HAND
+    - LEATHER_HELMET:0 HEAD
+  Drops:
+    - ARROW 2-4 0.7
+    - STICK 1 0.4
+  Skills:
+    - particles{particle=HAPPY_VILLAGER;amount=1;speed=0.01;hSpread=0.2;vSpread=0.2;yOffset=1} @self ~20

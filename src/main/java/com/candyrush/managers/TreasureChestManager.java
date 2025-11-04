@@ -29,14 +29,14 @@ public class TreasureChestManager {
 
     private final CandyRushPlugin plugin;
     private final Map<Location, ChestData> activeChests;
-    private final Set<Location> pendingRespawn;
+    private final Map<Location, ChestType> pendingRespawn;
     private BukkitTask respawnTask;
     private Integer currentRoundId;  // 現在のゲームラウンドID
 
     public TreasureChestManager(CandyRushPlugin plugin) {
         this.plugin = plugin;
         this.activeChests = new ConcurrentHashMap<>();
-        this.pendingRespawn = ConcurrentHashMap.newKeySet();
+        this.pendingRespawn = new ConcurrentHashMap<>();
         this.currentRoundId = null;
     }
 
@@ -120,11 +120,31 @@ public class TreasureChestManager {
 
             // チャンクごとに宝箱を配置
             for (int i = 0; i < chestsPerChunk; i++) {
-                Location chestLoc = findSafeChestLocationSync(chunk, center, radius);
+                // チェストタイプを先に決定
+                ChestType chestType = ChestType.random();
+
+                // 武器チェスト（DROPPER/DISPENSER）とトラップチェストは洞窟内に配置
+                Location chestLoc;
+                if (chestType == ChestType.TRAPPED_CHEST ||
+                    chestType == ChestType.DROPPER ||
+                    chestType == ChestType.DISPENSER) {
+                    chestLoc = findCaveChestLocationSync(chunk, center, radius);
+                    // 洞窟が見つからない場合は地上にフォールバック
+                    if (chestLoc == null) {
+                        plugin.getLogger().fine("No cave found for " + chestType + ", using surface spawn");
+                        chestLoc = findSafeChestLocationSync(chunk, center, radius);
+                    }
+                } else {
+                    // その他のチェストは地上に配置
+                    chestLoc = findSafeChestLocationSync(chunk, center, radius);
+                }
+
                 if (chestLoc != null) {
                     // メインスレッドでスポーン
+                    Location finalChestLoc = chestLoc;
+                    ChestType finalChestType = chestType;
                     Bukkit.getScheduler().runTask(plugin, () -> {
-                        spawnChest(chestLoc);
+                        spawnChestWithType(finalChestLoc, finalChestType);
                         totalChests.incrementAndGet();
                     });
                 } else {
@@ -196,6 +216,53 @@ public class TreasureChestManager {
     }
 
     /**
+     * チャンク内で洞窟内の宝箱配置場所を探す（武器チェスト・トラップチェスト用）
+     */
+    private Location findCaveChestLocationSync(Chunk chunk, Location center, int radius) {
+        Random random = new Random();
+        int distanceRejects = 0;
+        int caveRejects = 0;
+
+        // 高さ制限（洞窟は地下なので低めに設定）
+        int minHeight = 10;  // 岩盤より上
+        int maxHeight = 60;  // 地下深く
+
+        // 最大20回試行（洞窟は見つかりにくいため試行回数を増やす）
+        for (int attempt = 0; attempt < 20; attempt++) {
+            int x = (chunk.getX() << 4) + random.nextInt(16);
+            int z = (chunk.getZ() << 4) + random.nextInt(16);
+
+            // 中心からの距離チェック
+            double distance = Math.sqrt(Math.pow(x - center.getX(), 2) + Math.pow(z - center.getZ(), 2));
+            if (distance > radius) {
+                distanceRejects++;
+                continue;
+            }
+
+            // ランダムなY座標を選択（地下）
+            int y = minHeight + random.nextInt(maxHeight - minHeight);
+
+            // 洞窟かチェック（空気ブロックで、下が固体、上も空気）
+            Block ground = chunk.getWorld().getBlockAt(x, y - 1, z);
+            Block chestBlock = chunk.getWorld().getBlockAt(x, y, z);
+            Block above = chunk.getWorld().getBlockAt(x, y + 1, z);
+
+            // 洞窟の条件：下が固体、チェスト位置と上が空気
+            if (isSafeGroundBlock(ground) &&
+                chestBlock.getType() == Material.AIR &&
+                above.getType() == Material.AIR) {
+                plugin.getLogger().fine("Found cave location at Y=" + y + " for chest");
+                return new Location(chunk.getWorld(), x, y, z);
+            } else {
+                caveRejects++;
+            }
+        }
+
+        plugin.getLogger().fine("Cave chest spawn rejected: " + caveRejects + " times (no suitable cave found)");
+        return null;
+    }
+
+    /**
      * 安全な地面ブロックかチェック
      */
     private boolean isSafeGroundBlock(Block block) {
@@ -208,10 +275,9 @@ public class TreasureChestManager {
     }
 
     /**
-     * 宝箱を配置
+     * 宝箱を配置（チェストタイプ指定版）
      */
-    private void spawnChest(Location location) {
-        ChestType chestType = ChestType.random();
+    private void spawnChestWithType(Location location, ChestType chestType) {
         Block block = location.getBlock();
 
         block.setType(chestType.getMaterial());
@@ -681,11 +747,11 @@ public class TreasureChestManager {
 
         // トラップチェストの場合、ダメージを与える処理は別のリスナーで実装
 
-        // リスポーン待ちリストに追加
-        pendingRespawn.add(location);
+        // リスポーン待ちリストに追加（チェストタイプを保持）
+        pendingRespawn.put(location, data.getType());
         activeChests.remove(location);
 
-        plugin.getLogger().fine("Chest opened at " + formatLocation(location));
+        plugin.getLogger().fine("Chest opened at " + formatLocation(location) + " (Type: " + data.getType() + ")");
     }
 
     /**
@@ -708,20 +774,23 @@ public class TreasureChestManager {
         int respawnDelay = plugin.getConfigManager().getTreasureRespawnDelay();
 
         respawnTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            List<Location> toRespawn = new ArrayList<>(pendingRespawn);
+            List<Map.Entry<Location, ChestType>> toRespawn = new ArrayList<>(pendingRespawn.entrySet());
 
-            for (Location loc : toRespawn) {
+            for (Map.Entry<Location, ChestType> entry : toRespawn) {
+                Location loc = entry.getKey();
+                ChestType chestType = entry.getValue();
+
                 // 既に別のブロックがある場合はスキップ
                 if (loc.getBlock().getType() != Material.AIR) {
                     pendingRespawn.remove(loc);
                     continue;
                 }
 
-                // リスポーン
-                spawnChest(loc);
+                // リスポーン（元のチェストタイプと同じものを生成）
+                spawnChestWithType(loc, chestType);
                 pendingRespawn.remove(loc);
 
-                plugin.getLogger().fine("Respawned chest at " + formatLocation(loc));
+                plugin.getLogger().fine("Respawned " + chestType + " at " + formatLocation(loc));
             }
         }, respawnDelay * 20L, respawnDelay * 20L);
     }

@@ -1,0 +1,55 @@
+# Tier 3 Defense Monsters - Medium Difficulty
+# HP reduction: 30%, Damage reduction: 25%, Armor reduction: 30% (if ≥5)
+# For mid-level players with diamond sword and iron armor
+
+CandySpider_Tier3:
+  Type: SPIDER
+  Display: '&6[Lv.3] &2Mint Crawler'
+  Health: 14        # Reduced from 20 (30% reduction)
+  Damage: 2         # Reduced from 3 (25% reduction)
+  Armor: 0
+  Options:
+    MovementSpeed: 0.35
+    PreventItemPickup: true
+    PreventOtherDrops: true
+  Drops:
+    - STRING 2-3 0.8
+    - SPIDER_EYE 1-2 0.4
+  Skills:
+    - particles{particle=SLIME;amount=2;speed=0.01;hSpread=0.3;vSpread=0.3;yOffset=0.5} @self ~20
+
+CandyCreeper_Tier3:
+  Type: CREEPER
+  Display: '&6[Lv.3] &aSugar Bomber'
+  Health: 11        # Reduced from 15 (30% reduction)
+  Damage: 4         # Reduced from 5 (25% reduction) - explosion damage
+  Armor: 0
+  Options:
+    MovementSpeed: 0.25
+    PreventItemPickup: true
+    PreventOtherDrops: true
+  Drops:
+    - GUNPOWDER 1-2 0.7
+    - TNT 1 0.2
+  Skills:
+    - explosion{yield=1.5;fuse=30} @self ~onTimer:60    # Reduced from 2.0 (25% reduction)
+    - particles{particle=SMOKE;amount=1;speed=0.01;hSpread=0.2;vSpread=0.2;yOffset=1} @self ~10
+
+ChocolateSoldier_Tier3:
+  Type: HUSK
+  Display: '&6[Lv.3] &6Chocolate Soldier'
+  Health: 25        # Reduced from 35 (30% reduction)
+  Damage: 3         # Reduced from 4 (25% reduction)
+  Armor: 2          # Reduced from 3 (30% reduction)
+  Options:
+    MovementSpeed: 0.25
+    PreventItemPickup: true
+    PreventOtherDrops: true
+    PreventSunburn: true
+  Equipment:
+    - WOODEN_AXE:0 HAND
+  Drops:
+    - COCOA_BEANS 2-4 0.7
+    - COOKIE 1-2 0.5
+  Skills:
+    - particles{particle=CRIT;amount=1;speed=0.01;hSpread=0.2;vSpread=0.2;yOffset=1} @self ~20

@@ -305,6 +305,7 @@ public class ScoreboardManager {
 
     /**
      * チーム順位を表示
+     * ゲームチーム（BLUE, GREEN, YELLOW）のみを表示（REDは除外）
      */
     private void displayTeamRankings(Objective objective, int startLine) {
         TeamManager teamManager = plugin.getTeamManager();
@@ -314,18 +315,19 @@ public class ScoreboardManager {
 
         int line = startLine;
 
-        // 各チームのポイントを取得してソート
-        java.util.List<TeamColor> teams = new java.util.ArrayList<>(java.util.Arrays.asList(TeamColor.values()));
+        // ゲームチームのみ（REDを除外）
+        TeamColor[] gameTeams = {TeamColor.BLUE, TeamColor.GREEN, TeamColor.YELLOW};
+        java.util.List<TeamColor> teams = new java.util.ArrayList<>(java.util.Arrays.asList(gameTeams));
+
+        // ポイント順にソート
         teams.sort((t1, t2) -> Integer.compare(
             teamManager.getTeamPoints(t2),
             teamManager.getTeamPoints(t1)
         ));
 
-        // 上位3チームを表示
+        // ゲームチーム3つすべてを表示
         int rank = 1;
         for (TeamColor team : teams) {
-            if (rank > 3) break;
-
             int points = teamManager.getTeamPoints(team);
             String medal = rank == 1 ? "&6🥇" : rank == 2 ? "&7🥈" : "&c🥉";
             setScore(objective, MessageUtils.colorize(

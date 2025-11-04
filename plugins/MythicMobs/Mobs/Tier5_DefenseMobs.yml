@@ -1,0 +1,102 @@
+# Tier 5 Defense Monsters - Expert Difficulty (Elite Mobs)
+# HP reduction: 10%, Damage reduction: 10%, Armor reduction: 30% (if ≥5)
+# For expert players with diamond gear and enchantments
+
+EliteCandyZombie_Tier5:
+  Type: ZOMBIE
+  Display: '&4&l[Lv.5] &6&lElite Candy Zombie'
+  Health: 45        # Reduced from 50 (10% reduction)
+  Damage: 5         # Reduced from 6 (10% reduction)
+  Armor: 4          # Reduced from 5 (30% reduction, but stays at 4 to maintain elite status)
+  Options:
+    MovementSpeed: 0.3
+    PreventItemPickup: true
+    PreventOtherDrops: true
+    PreventSunburn: true
+    AlwaysShowName: true
+  Equipment:
+    - IRON_SWORD:0 HAND
+    - IRON_HELMET:0 HEAD
+    - IRON_CHESTPLATE:0 CHEST
+  Drops:
+    - DIAMOND 1 0.3
+    - GOLD_INGOT 2-4 0.7
+    - SUGAR 3-5 0.9
+  Skills:
+    - potion{type=STRENGTH;duration=100;lvl=1} @self ~onDamaged
+    - particles{particle=FLAME;amount=3;speed=0.02;hSpread=0.4;vSpread=0.4;yOffset=1} @self ~15
+
+EliteCandySkeleton_Tier5:
+  Type: SKELETON
+  Display: '&4&l[Lv.5] &e&lElite Lollipop Archer'
+  Health: 36        # Reduced from 40 (10% reduction)
+  Damage: 5         # Reduced from 5 (10% reduction, min 1 so stays at 5)
+  Armor: 4          # Reduced from 5 (30% reduction)
+  Options:
+    MovementSpeed: 0.3
+    PreventItemPickup: true
+    PreventOtherDrops: true
+    PreventSunburn: true
+    AlwaysShowName: true
+  Equipment:
+    - BOW:0 HAND
+    - IRON_HELMET:0 HEAD
+    - IRON_CHESTPLATE:0 CHEST
+  Drops:
+    - DIAMOND 1 0.3
+    - ARROW 5-10 0.9
+    - STICK 2-3 0.7
+  Skills:
+    - shoot{type=ARROW;velocity=2} @target ~onTimer:40
+    - particles{particle=ENCHANTED_HIT;amount=3;speed=0.02;hSpread=0.4;vSpread=0.4;yOffset=1} @self ~15
+
+EliteGummyTitan_Tier5:
+  Type: ZOMBIE
+  Display: '&4&l[Lv.5] &d&lElite Gummy Titan'
+  Health: 72        # Reduced from 80 (10% reduction)
+  Damage: 5         # Reduced from 5 (10% reduction, min 1 so stays at 5)
+  Armor: 6          # Reduced from 8 (30% reduction)
+  Options:
+    MovementSpeed: 0.25
+    PreventItemPickup: true
+    PreventOtherDrops: true
+    PreventSunburn: true
+    AlwaysShowName: true
+  Equipment:
+    - IRON_SWORD:0 HAND
+    - IRON_HELMET:0 HEAD
+    - IRON_CHESTPLATE:0 CHEST
+    - IRON_LEGGINGS:0 LEGS
+    - IRON_BOOTS:0 FEET
+  Drops:
+    - DIAMOND 2 0.4
+    - HONEY_BOTTLE 2-3 0.8
+    - SWEET_BERRIES 5-10 0.9
+  Skills:
+    - potion{type=STRENGTH;duration=100;lvl=2} @self ~onDamaged
+    - potion{type=REGENERATION;duration=100;lvl=1} @self ~onTimer:100
+    - particles{particle=HEART;amount=4;speed=0.02;hSpread=0.5;vSpread=0.5;yOffset=1} @self ~15
+
+EliteChocolateKnight_Tier5:
+  Type: HUSK
+  Display: '&4&l[Lv.5] &6&lElite Chocolate Knight'
+  Health: 50        # Reduced from 55 (10% reduction)
+  Damage: 5         # Reduced from 6 (10% reduction)
+  Armor: 4          # Reduced from 6 (30% reduction)
+  Options:
+    MovementSpeed: 0.3
+    PreventItemPickup: true
+    PreventOtherDrops: true
+    PreventSunburn: true
+    AlwaysShowName: true
+  Equipment:
+    - IRON_AXE:0 HAND
+    - IRON_HELMET:0 HEAD
+    - IRON_CHESTPLATE:0 CHEST
+  Drops:
+    - DIAMOND 1-2 0.4
+    - COCOA_BEANS 5-8 0.9
+    - COOKIE 3-5 0.8
+  Skills:
+    - potion{type=STRENGTH;duration=100;lvl=1} @self ~onDamaged
+    - particles{particle=CRIT_MAGIC;amount=3;speed=0.02;hSpread=0.4;vSpread=0.4;yOffset=1} @self ~15
