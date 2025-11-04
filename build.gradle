@@ -14,7 +14,7 @@ plugins {
 }
 
 group = 'com.candyrush'
-version = '1.0.1'
+version = '1.0.2'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -156,7 +156,14 @@ task copyPlugin(type: Copy, dependsOn: shadowJar) {
     rename { 'CandyRush.jar' }
 }
 
-task runServer(dependsOn: [setupServer, downloadMythicMobs, copyPlugin]) {
+task copyMythicMobsConfig(type: Copy) {
+    from 'plugins/MythicMobs/Mobs'
+    into 'run/plugins/MythicMobs/Mobs'
+    include '*.yml'
+    println "Copying MythicMobs configuration files..."
+}
+
+task runServer(dependsOn: [setupServer, downloadMythicMobs, copyPlugin, copyMythicMobsConfig]) {
     doLast {
         println "Starting Paper server..."
         println "Type 'stop' to shutdown the server"
