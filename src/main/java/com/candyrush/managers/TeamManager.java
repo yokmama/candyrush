@@ -157,6 +157,20 @@ public class TeamManager {
     }
 
     /**
+     * プレイヤーを最も人数が少ないゲームチームに割り当て（途中参加用）
+     * バランスを保つため、最も人数が少ないチームに自動的に配置
+     */
+    public void assignPlayerToSmallestTeam(UUID playerUuid) {
+        TeamColor smallestTeam = getSmallestTeam();
+        assignPlayerToTeam(playerUuid, smallestTeam);
+
+        Player player = Bukkit.getPlayer(playerUuid);
+        if (player != null) {
+            plugin.getLogger().info("Mid-game join: Assigned " + player.getName() + " to " + smallestTeam + " team (smallest team)");
+        }
+    }
+
+    /**
      * チームにポイントを追加してスコアボードを更新
      */
     public void addTeamPoints(TeamColor color, int points) {

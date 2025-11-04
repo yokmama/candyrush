@@ -1,0 +1,59 @@
+# Tier 4 Defense Monsters - Hard Difficulty
+# HP reduction: 20%, Damage reduction: 20%, Armor reduction: 30% (if ≥5)
+# For advanced players with diamond gear
+
+ChocolateSoldier_Tier4:
+  Type: HUSK
+  Display: '&c[Lv.4] &6Chocolate Soldier'
+  Health: 28        # Reduced from 35 (20% reduction)
+  Damage: 3         # Reduced from 4 (20% reduction)
+  Armor: 2          # Reduced from 3 (30% reduction)
+  Options:
+    MovementSpeed: 0.25
+    PreventItemPickup: true
+    PreventOtherDrops: true
+    PreventSunburn: true
+  Equipment:
+    - WOODEN_AXE:0 HAND
+  Drops:
+    - COCOA_BEANS 3-5 0.8
+    - COOKIE 2-3 0.6
+  Skills:
+    - particles{particle=CRIT;amount=2;speed=0.01;hSpread=0.3;vSpread=0.3;yOffset=1} @self ~20
+
+LollipopArcher_Tier4:
+  Type: SKELETON
+  Display: '&c[Lv.4] &eLollipop Archer'
+  Health: 18        # Reduced from 22 (20% reduction)
+  Damage: 2         # Reduced from 3 (20% reduction)
+  Armor: 1          # Reduced from 2 (30% reduction)
+  Options:
+    MovementSpeed: 0.25
+    PreventItemPickup: true
+    PreventOtherDrops: true
+    PreventSunburn: true
+  Equipment:
+    - BOW:0 HAND
+    - LEATHER_HELMET:0 HEAD
+  Drops:
+    - ARROW 3-5 0.8
+    - STICK 1-2 0.6
+  Skills:
+    - particles{particle=ENCHANTED_HIT;amount=1;speed=0.01;hSpread=0.2;vSpread=0.2;yOffset=1} @self ~20
+
+MintRunner_Tier4:
+  Type: SPIDER
+  Display: '&c[Lv.4] &bMint Runner'
+  Health: 14        # Reduced from 18 (20% reduction)
+  Damage: 2         # Reduced from 3 (20% reduction)
+  Armor: 0
+  Options:
+    MovementSpeed: 0.4
+    PreventItemPickup: true
+    PreventOtherDrops: true
+  Drops:
+    - STRING 2-4 0.8
+    - SPIDER_EYE 1-2 0.5
+  Skills:
+    - particles{particle=CLOUD;amount=2;speed=0.02;hSpread=0.3;vSpread=0.3;yOffset=0.5} @self ~15
+    - potion{type=SPEED;duration=200;lvl=1} @self ~onSpawn

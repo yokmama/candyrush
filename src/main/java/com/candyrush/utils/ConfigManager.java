@@ -383,6 +383,46 @@ public class ConfigManager {
     }
 
     /**
+     * Check if distance-based difficulty is enabled
+     * @return true if enabled
+     */
+    public boolean isDistanceBasedDifficultyEnabled() {
+        return config.getBoolean("event.distance-based-difficulty.enabled", false);
+    }
+
+    /**
+     * Get the maximum distance for Tier 1
+     * @return Max distance in blocks
+     */
+    public int getTier1MaxDistance() {
+        return config.getInt("event.distance-based-difficulty.tier-1-max-distance", 50);
+    }
+
+    /**
+     * Get the maximum distance for Tier 2
+     * @return Max distance in blocks
+     */
+    public int getTier2MaxDistance() {
+        return config.getInt("event.distance-based-difficulty.tier-2-max-distance", 100);
+    }
+
+    /**
+     * Get the maximum distance for Tier 3
+     * @return Max distance in blocks
+     */
+    public int getTier3MaxDistance() {
+        return config.getInt("event.distance-based-difficulty.tier-3-max-distance", 150);
+    }
+
+    /**
+     * Get the maximum distance for Tier 4
+     * @return Max distance in blocks
+     */
+    public int getTier4MaxDistance() {
+        return config.getInt("event.distance-based-difficulty.tier-4-max-distance", 200);
+    }
+
+    /**
      * Reload configuration from disk
      */
     public void reload() {

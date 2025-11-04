@@ -1,0 +1,24 @@
+# Event NPC Tier 5 - Expert Difficulty
+# Visual: Wandering trader with epic purple/dark red particles and glowing effect
+EventNPC_Tier5:
+  Type: WANDERING_TRADER
+  Display: '&4&l[Lv.5] Event NPC'
+  Health: 20
+  Damage: 0
+  Options:
+    MovementSpeed: 0
+    Silent: true
+    Despawn: false
+    PreventOtherDrops: true
+    PreventItemPickup: true
+    PreventRenaming: true
+    Glowing: true
+  DamageModifiers:
+    - ALL 0
+  Skills:
+    - particles{particle=FLAME;amount=5;speed=0.05;hSpread=0.6;vSpread=0.6;yOffset=1} @self ~10
+    - particles{particle=LAVA;amount=3;speed=0.03;hSpread=0.4;vSpread=0.4;yOffset=0.5} @self ~15
+    - particles{particle=FIREWORK;amount=5;speed=0.05;hSpread=0.5;vSpread=0.5;yOffset=1.5} @self ~12
+    - particles{particle=ENCHANT;amount=3;speed=0.03;hSpread=0.5;vSpread=0.8;yOffset=1} @self ~15
+    - particles{particle=SMOKE;amount=2;speed=0.02;hSpread=0.3;vSpread=0.3;yOffset=0.1} @self ~20
+    - effect{type=GLOWING;duration=999999} @self ~1

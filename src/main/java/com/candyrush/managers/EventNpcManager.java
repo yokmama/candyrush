@@ -35,6 +35,7 @@ public class EventNpcManager {
     private Integer currentRoundId;
     private NpcNameGenerator nameGenerator;
     private final Random random;
+    private Location mapCenter; // マップの中心座標（距離ベース難易度用）
 
     public EventNpcManager(CandyRushPlugin plugin) {
         this.plugin = plugin;
@@ -45,6 +46,7 @@ public class EventNpcManager {
         this.pendingNpcRespawn = new ConcurrentHashMap<>();
         this.currentRoundId = null;
         this.random = new Random();
+        this.mapCenter = null;
     }
 
     /**
@@ -68,6 +70,9 @@ public class EventNpcManager {
      * Randomly select a tier from 1-5 using weighted probability
      * Higher tier weights = more common spawns
      * @return Weighted random tier between 1-5
+     */
+    /**
+     * 重み付けランダムでティアを選択
      */
     private NPCEventTier selectRandomTier() {
         List<NPCEventTier> tiers = plugin.getConfigManager().getEventTiers();
@@ -101,6 +106,51 @@ public class EventNpcManager {
     }
 
     /**
+     * 中心からの距離に基づいてティアを選択
+     * @param npcLocation NPC座標
+     * @return 距離に応じたティア
+     */
+    private NPCEventTier selectTierByDistance(Location npcLocation) {
+        if (mapCenter == null) {
+            plugin.getLogger().warning("Map center not set, falling back to random tier selection");
+            return selectRandomTier();
+        }
+
+        // 2D距離を計算（Y座標は無視）
+        double distance = Math.sqrt(
+            Math.pow(npcLocation.getX() - mapCenter.getX(), 2) +
+            Math.pow(npcLocation.getZ() - mapCenter.getZ(), 2)
+        );
+
+        // 距離に基づいてティアを決定
+        int tierLevel;
+        if (distance < plugin.getConfigManager().getTier1MaxDistance()) {
+            tierLevel = 1;
+        } else if (distance < plugin.getConfigManager().getTier2MaxDistance()) {
+            tierLevel = 2;
+        } else if (distance < plugin.getConfigManager().getTier3MaxDistance()) {
+            tierLevel = 3;
+        } else if (distance < plugin.getConfigManager().getTier4MaxDistance()) {
+            tierLevel = 4;
+        } else {
+            tierLevel = 5;
+        }
+
+        NPCEventTier tier = plugin.getConfigManager().getEventTier(tierLevel);
+        if (tier == null) {
+            plugin.getLogger().warning("Tier " + tierLevel + " not found, falling back to tier 1");
+            return plugin.getConfigManager().getEventTier(1);
+        }
+
+        // デバッグ情報を常に出力（距離ベース難易度の確認用）
+        plugin.getLogger().info(String.format("NPC spawned at distance %.1fm from center -> Tier %d (Pos: %.1f, %.1f, %.1f | Center: %.1f, %.1f, %.1f)",
+            distance, tierLevel,
+            npcLocation.getX(), npcLocation.getY(), npcLocation.getZ(),
+            mapCenter.getX(), mapCenter.getY(), mapCenter.getZ()));
+        return tier;
+    }
+
+    /**
      * ゲーム開始時にイベントNPCを配置
      * @param world ワールド
      * @param center 中心座標
@@ -109,6 +159,7 @@ public class EventNpcManager {
      */
     public void spawnEventNpcs(World world, Location center, int radius, Integer roundId) {
         this.currentRoundId = roundId;
+        this.mapCenter = center; // 距離ベース難易度計算用に保存
 
         // MythicMobsが利用できない場合はスキップ
         if (plugin.getMythicMobsIntegration() == null) {
@@ -220,8 +271,14 @@ public class EventNpcManager {
      * NPCをスポーン (tier-based)
      */
     private void spawnNpc(Location location) {
-        // Select random tier
-        NPCEventTier selectedTier = selectRandomTier();
+        // Select tier based on distance if enabled, otherwise use weighted random
+        NPCEventTier selectedTier;
+        if (plugin.getConfigManager().isDistanceBasedDifficultyEnabled()) {
+            selectedTier = selectTierByDistance(location);
+        } else {
+            selectedTier = selectRandomTier();
+        }
+
         if (selectedTier == null) {
             plugin.getLogger().warning("Failed to select tier for NPC at " + formatLocation(location));
             return;
@@ -1016,8 +1073,13 @@ public class EventNpcManager {
 
                 // モンスタータイプを選択（ランダム）
                 String mobType;
-                if (isFinalWave && !eliteMobTypes.isEmpty() && random.nextDouble() < 0.7) {
-                    // 最終波は70%の確率でエリートモブ
+
+                // Tier 1-2では最終波でもエリートを出さない（初心者向け）
+                int tierLevel = (npcData != null && npcData.getTier() != null) ? npcData.getTier().getTier() : 1;
+                boolean allowElite = tierLevel >= 3; // Tier 3以上でのみエリート出現
+
+                if (isFinalWave && allowElite && !eliteMobTypes.isEmpty() && random.nextDouble() < 0.7) {
+                    // 最終波は70%の確率でエリートモブ（Tier 3以上のみ）
                     mobType = eliteMobTypes.get(random.nextInt(eliteMobTypes.size()));
                     plugin.getLogger().info("Selected elite mob type: " + mobType);
                 } else {

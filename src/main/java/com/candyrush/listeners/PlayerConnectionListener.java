@@ -54,7 +54,9 @@ public class PlayerConnectionListener implements Listener {
                     break;
                 case "RUNNING":
                     MessageUtils.sendMessage(player, "&aゲーム進行中！参加してください");
-                    // ゲーム中に参加したプレイヤーにもショップアイテムを付与
+                    // ゲーム中に参加したプレイヤーを最も人数が少ないチームに割り当て
+                    plugin.getTeamManager().assignPlayerToSmallestTeam(player.getUniqueId());
+                    // ショップアイテムを付与
                     plugin.getShopManager().giveShopItem(player);
                     break;
                 case "COOLDOWN":
